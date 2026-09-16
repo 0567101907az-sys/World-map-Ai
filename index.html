@@ -4,12 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>TERRA X</title>
+<title>TERRA X 5.0</title>
 
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
 <style>
 *{
@@ -19,12 +17,11 @@
 
 html,body{
   margin:0;
-  padding:0;
   width:100%;
   height:100%;
   overflow:hidden;
-  background:#05080d;
-  color:#e9f7ff;
+  background:#03070b;
+  color:#eafaff;
   font-family:Arial,Helvetica,sans-serif;
 }
 
@@ -37,103 +34,94 @@ button{
 }
 
 #app{
+  position:relative;
   width:100%;
   height:100%;
-  position:relative;
 }
 
-/* =========================
-   NORMAL MAP SCREEN
-========================= */
+/* =====================================================
+   NORMAL MAP
+===================================================== */
 
 #mapScreen{
   position:absolute;
   inset:0;
   display:flex;
   flex-direction:column;
-  background:#05080d;
 }
 
 .topbar{
   height:62px;
   min-height:62px;
-  background:rgba(4,9,15,.96);
-  border-bottom:1px solid #173044;
+  z-index:2000;
   display:flex;
   align-items:center;
-  gap:8px;
-  padding:8px;
-  z-index:1000;
+  gap:7px;
+  padding:7px;
+  background:rgba(3,8,13,.97);
+  border-bottom:1px solid #17384b;
 }
 
 .logo{
+  font-size:18px;
   font-weight:900;
   letter-spacing:2px;
-  font-size:18px;
   white-space:nowrap;
 }
 
 .logo span{
-  color:#45d9ff;
+  color:#3fdcff;
 }
 
 .searchBox{
   flex:1;
+  min-width:0;
   display:flex;
-  gap:6px;
+  gap:5px;
 }
 
 .searchBox input{
-  min-width:0;
   width:100%;
+  min-width:0;
   height:42px;
-  border:1px solid #1d4258;
+  border:1px solid #1b455a;
   border-radius:10px;
-  background:#08121b;
+  background:#07131c;
   color:white;
   outline:none;
-  padding:0 12px;
+  padding:0 11px;
 }
 
 .searchBox input:focus{
-  border-color:#45d9ff;
-  box-shadow:0 0 12px rgba(69,217,255,.15);
+  border-color:#35d5ff;
+  box-shadow:0 0 14px rgba(53,213,255,.15);
 }
 
-.iconBtn,
-.searchBtn{
+.btn{
   height:42px;
-  border:1px solid #1d4258;
+  border:1px solid #1c465a;
   border-radius:10px;
-  background:#091722;
+  background:#091721;
   color:#dff8ff;
-  padding:0 12px;
+  padding:0 11px;
 }
 
 .searchBtn{
-  background:#0b718f;
-  border-color:#159fc6;
+  background:#075b75;
+  border-color:#27c8ef;
   font-weight:bold;
-}
-
-.iconBtn:active,
-.searchBtn:active,
-.layerBtn:active,
-.actionBtn:active{
-  transform:scale(.97);
 }
 
 #map{
   flex:1;
-  width:100%;
   min-height:0;
 }
 
 .bottomPanel{
-  background:rgba(4,9,15,.96);
-  border-top:1px solid #173044;
+  z-index:2000;
+  background:rgba(3,8,13,.97);
+  border-top:1px solid #17384b;
   padding:8px;
-  z-index:1000;
 }
 
 .layerRow{
@@ -143,47 +131,109 @@ button{
   padding-bottom:7px;
 }
 
-.layerRow::-webkit-scrollbar{
+.layerRow::-webkit-scrollbar,
+.categoryRow::-webkit-scrollbar{
   display:none;
 }
 
-.layerBtn{
+.layerBtn,
+.categoryBtn{
   flex:0 0 auto;
-  border:1px solid #1b3c50;
-  background:#091722;
-  color:#cdebf5;
+  border:1px solid #1b4053;
+  background:#08151e;
+  color:#cdeaf3;
   border-radius:9px;
-  padding:8px 12px;
-  font-size:13px;
+  padding:8px 11px;
+  font-size:12px;
 }
 
 .layerBtn.active{
-  background:#0b607a;
-  border-color:#2ec7f1;
+  background:#07566e;
+  border-color:#31d7ff;
   color:white;
+}
+
+.categoryRow{
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
+  padding-bottom:7px;
+}
+
+.categoryBtn{
+  font-size:11px;
 }
 
 .intelOpen{
   width:100%;
-  height:46px;
-  border:1px solid #26bde8;
-  border-radius:11px;
-  background:linear-gradient(90deg,#073447,#0a607a);
+  height:45px;
+  border:1px solid #28d2ff;
+  border-radius:10px;
   color:white;
   font-weight:900;
-  letter-spacing:1px;
+  background:linear-gradient(90deg,#063448,#0a6078);
 }
 
-/* =========================
-   INTELLIGENCE SCREEN
-========================= */
+/* =====================================================
+   SEARCH RESULTS
+===================================================== */
+
+#resultsPanel{
+  position:absolute;
+  top:68px;
+  right:7px;
+  left:7px;
+  z-index:2500;
+  max-height:48%;
+  overflow:auto;
+  display:none;
+  background:rgba(3,9,14,.97);
+  border:1px solid #1c5268;
+  border-radius:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.45);
+}
+
+.resultItem{
+  padding:11px;
+  border-bottom:1px solid #143241;
+}
+
+.resultItem:last-child{
+  border-bottom:0;
+}
+
+.resultName{
+  color:#ecfbff;
+  font-weight:bold;
+  font-size:13px;
+}
+
+.resultMeta{
+  color:#7faab7;
+  font-size:10px;
+  margin-top:4px;
+}
+
+.resultOpen{
+  margin-top:7px;
+  border:1px solid #1e647b;
+  background:#071923;
+  color:#55dcff;
+  border-radius:7px;
+  padding:6px 9px;
+  font-size:10px;
+}
+
+/* =====================================================
+   INTELLIGENCE
+===================================================== */
 
 #intelScreen{
   position:absolute;
   inset:0;
   z-index:5000;
   display:none;
-  background:#03070b;
+  background:#02060a;
 }
 
 .intelLayout{
@@ -194,15 +244,15 @@ button{
 }
 
 .intelHeader{
-  min-height:58px;
   height:58px;
-  background:rgba(2,7,12,.98);
-  border-bottom:1px solid #1b465c;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:7px 9px;
+  min-height:58px;
   z-index:20;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:7px 9px;
+  background:rgba(2,7,12,.98);
+  border-bottom:1px solid #19465a;
 }
 
 .intelTitle{
@@ -213,19 +263,19 @@ button{
 
 .intelTitle small{
   display:block;
-  color:#54dfff;
-  font-size:9px;
-  letter-spacing:2px;
   margin-top:3px;
+  color:#4bdcff;
+  font-size:8px;
+  letter-spacing:2px;
 }
 
 .closeIntel{
-  border:1px solid #4b2930;
-  background:#1b0c11;
-  color:#ffb8c2;
-  border-radius:9px;
   height:40px;
-  padding:0 12px;
+  border:1px solid #542b35;
+  border-radius:9px;
+  background:#190b10;
+  color:#ffbec7;
+  padding:0 11px;
 }
 
 .intelMapArea{
@@ -241,19 +291,20 @@ button{
 
 .targetBadge{
   position:absolute;
-  top:10px;
-  left:10px;
-  z-index:1000;
-  background:rgba(2,8,13,.9);
-  border:1px solid #1d6179;
+  top:9px;
+  left:9px;
+  z-index:1200;
+  max-width:65%;
+  background:rgba(2,8,13,.92);
+  border:1px solid #20586e;
   border-radius:9px;
   padding:8px 10px;
-  font-size:11px;
+  font-size:10px;
   direction:ltr;
 }
 
 .targetBadge b{
-  color:#4ee1ff;
+  color:#50ddff;
 }
 
 .intelScroll{
@@ -262,14 +313,13 @@ button{
   right:0;
   bottom:0;
   z-index:1100;
-  max-height:54%;
-  overflow-y:auto;
-  padding:9px;
+  max-height:61%;
+  overflow:auto;
+  padding:28px 8px 9px;
   background:linear-gradient(
     transparent,
-    rgba(2,6,10,.96) 18%
+    rgba(2,6,10,.98) 18%
   );
-  padding-top:28px;
 }
 
 .statsGrid{
@@ -279,46 +329,44 @@ button{
 }
 
 .stat{
-  min-width:0;
-  background:rgba(5,15,23,.94);
-  border:1px solid #17465a;
+  background:rgba(5,15,23,.95);
+  border:1px solid #17495d;
   border-radius:10px;
-  padding:8px 5px;
+  padding:8px 4px;
   text-align:center;
 }
 
 .statLabel{
-  font-size:9px;
-  color:#81a9b8;
+  font-size:8px;
+  color:#7fa8b6;
   margin-bottom:5px;
 }
 
 .statValue{
-  font-size:14px;
+  font-size:13px;
   font-weight:900;
-  color:#eafcff;
   direction:ltr;
 }
 
 .analysisBox{
   margin-top:7px;
-  background:rgba(4,12,18,.95);
-  border:1px solid #164154;
-  border-radius:10px;
   padding:9px;
+  background:rgba(4,12,18,.96);
+  border:1px solid #164354;
+  border-radius:10px;
 }
 
 .analysisTop{
   display:flex;
   justify-content:space-between;
+  color:#9dc4d0;
   font-size:10px;
-  color:#9bc0cc;
   margin-bottom:7px;
 }
 
 .progress{
   height:5px;
-  background:#091923;
+  background:#07131a;
   border-radius:99px;
   overflow:hidden;
 }
@@ -326,8 +374,8 @@ button{
 .progressBar{
   width:0%;
   height:100%;
-  background:#35d6ff;
-  transition:width .4s ease;
+  background:#32d7ff;
+  transition:width .35s;
 }
 
 .actionGrid{
@@ -340,22 +388,22 @@ button{
 .actionBtn{
   min-height:43px;
   border:1px solid #17485c;
-  background:#07141e;
-  color:#d8f6ff;
   border-radius:9px;
-  font-size:11px;
+  background:#07141d;
+  color:#d8f7ff;
+  font-size:10px;
   font-weight:bold;
 }
 
-.actionBtn:hover{
-  border-color:#32d5ff;
+.actionBtn:active{
+  transform:scale(.97);
 }
 
 .timeline{
-  margin-top:7px;
   display:flex;
   gap:6px;
   overflow-x:auto;
+  margin-top:7px;
 }
 
 .timeline::-webkit-scrollbar{
@@ -364,70 +412,82 @@ button{
 
 .yearBtn{
   flex:1;
-  min-width:70px;
-  border:1px solid #17475a;
-  background:#08141e;
-  color:#9fc5d1;
+  min-width:68px;
+  border:1px solid #17485b;
   border-radius:8px;
+  background:#08141d;
+  color:#91b6c2;
   padding:8px 5px;
   font-size:10px;
 }
 
 .yearBtn.active{
-  background:#0a5871;
-  border-color:#31d8ff;
+  background:#07566d;
+  border-color:#32d8ff;
   color:white;
 }
 
 .resultBox{
   margin-top:7px;
-  border:1px solid #17475a;
-  border-radius:10px;
-  background:rgba(4,12,18,.96);
   padding:10px;
+  background:rgba(4,12,18,.96);
+  border:1px solid #17485b;
+  border-radius:10px;
+  color:#b9d8e1;
   font-size:11px;
-  line-height:1.6;
-  color:#b9d9e2;
+  line-height:1.7;
 }
 
 .resultBox strong{
-  color:#4cddff;
+  color:#4bdcff;
 }
 
-.leaflet-control-attribution{
-  font-size:8px !important;
+/* =====================================================
+   TOAST
+===================================================== */
+
+#toast{
+  position:absolute;
+  left:50%;
+  bottom:155px;
+  transform:translateX(-50%);
+  z-index:7000;
+  display:none;
+  max-width:88%;
+  background:rgba(3,12,18,.96);
+  border:1px solid #2bbedd;
+  color:#e8fbff;
+  border-radius:10px;
+  padding:9px 13px;
+  font-size:11px;
+  text-align:center;
 }
 
-/* =========================
+/* =====================================================
    MOBILE
-========================= */
+===================================================== */
 
 @media(max-width:600px){
+
+  .logo{
+    font-size:15px;
+  }
 
   .topbar{
     height:58px;
     min-height:58px;
   }
 
-  .logo{
-    font-size:15px;
-  }
-
-  .searchBox{
-    gap:4px;
-  }
-
   .searchBox input{
-    font-size:13px;
-    padding:0 8px;
+    font-size:12px;
   }
 
   .searchBtn{
-    padding:0 9px;
+    padding:0 8px;
   }
 
-  .iconBtn{
-    padding:0 9px;
+  .btn{
+    padding:0 8px;
   }
 
   .statsGrid{
@@ -439,7 +499,7 @@ button{
   }
 
   .intelScroll{
-    max-height:61%;
+    max-height:64%;
   }
 }
 </style>
@@ -449,295 +509,380 @@ button{
 
 <div id="app">
 
-  <!-- =========================
-       NORMAL MAP
-  ========================== -->
+<!-- =====================================================
+     MAP SCREEN
+===================================================== -->
 
-  <section id="mapScreen">
+<section id="mapScreen">
 
-    <div class="topbar">
+  <div class="topbar">
 
-      <div class="logo">
-        TERRA <span>X</span>
-      </div>
+    <div class="logo">
+      TERRA <span>X</span>
+    </div>
 
-      <div class="searchBox">
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="ابحث عن مدينة أو مكان..."
-          autocomplete="off"
-        >
+    <div class="searchBox">
 
-        <button
-          class="searchBtn"
-          onclick="searchPlace()"
-        >
-          بحث
-        </button>
-      </div>
+      <input
+        id="searchInput"
+        placeholder="ابحث عن مدينة، مكان، أو منطقة..."
+        autocomplete="off"
+      >
 
       <button
-        class="iconBtn"
-        onclick="getLocation()"
-        title="موقعي"
+        class="btn searchBtn"
+        onclick="smartSearch()"
       >
-        📍
+        بحث
       </button>
 
     </div>
 
-    <div id="map"></div>
+    <button
+      class="btn"
+      onclick="getLocation()"
+      title="موقعي"
+    >
+      📍
+    </button>
 
-    <div class="bottomPanel">
+  </div>
 
-      <div class="layerRow">
+  <div id="map"></div>
 
-        <button
-          id="streetBtn"
-          class="layerBtn active"
-          onclick="setLayer('street')"
-        >
-          🗺️ Street
-        </button>
+  <div
+    id="resultsPanel"
+  ></div>
 
-        <button
-          id="satelliteBtn"
-          class="layerBtn"
-          onclick="setLayer('satellite')"
-        >
-          🛰️ Satellite
-        </button>
+  <div class="bottomPanel">
 
-        <button
-          id="terrainBtn"
-          class="layerBtn"
-          onclick="setLayer('terrain')"
-        >
-          ⛰️ Terrain
-        </button>
-
-      </div>
+    <div class="layerRow">
 
       <button
-        class="intelOpen"
-        onclick="openIntelligence()"
+        id="streetBtn"
+        class="layerBtn active"
+        onclick="setLayer('street')"
       >
-        🛰️ OPEN TERRA X INTELLIGENCE
+        🗺️ Street
+      </button>
+
+      <button
+        id="satelliteBtn"
+        class="layerBtn"
+        onclick="setLayer('satellite')"
+      >
+        🛰️ Satellite
+      </button>
+
+      <button
+        id="terrainBtn"
+        class="layerBtn"
+        onclick="setLayer('terrain')"
+      >
+        ⛰️ Terrain
       </button>
 
     </div>
 
-  </section>
+    <div class="categoryRow">
+
+      <button
+        class="categoryBtn"
+        onclick="categorySearch('hospital')"
+      >
+        🏥 مستشفيات
+      </button>
+
+      <button
+        class="categoryBtn"
+        onclick="categorySearch('school')"
+      >
+        🏫 مدارس
+      </button>
+
+      <button
+        class="categoryBtn"
+        onclick="categorySearch('university')"
+      >
+        🎓 جامعات
+      </button>
+
+      <button
+        class="categoryBtn"
+        onclick="categorySearch('pharmacy')"
+      >
+        💊 صيدليات
+      </button>
+
+      <button
+        class="categoryBtn"
+        onclick="categorySearch('restaurant')"
+      >
+        🍽️ مطاعم
+      </button>
+
+      <button
+        class="categoryBtn"
+        onclick="categorySearch('hotel')"
+      >
+        🏨 فنادق
+      </button>
+
+      <button
+        class="categoryBtn"
+        onclick="categorySearch('mosque')"
+      >
+        🕌 مساجد
+      </button>
+
+    </div>
+
+    <button
+      class="intelOpen"
+      onclick="openIntelligence()"
+    >
+      🛰️ OPEN TERRA X INTELLIGENCE
+    </button>
+
+  </div>
+
+</section>
 
 
-  <!-- =========================
-       INTELLIGENCE
-  ========================== -->
+<!-- =====================================================
+     INTELLIGENCE SCREEN
+===================================================== -->
 
-  <section id="intelScreen">
+<section id="intelScreen">
 
-    <div class="intelLayout">
+  <div class="intelLayout">
 
-      <header class="intelHeader">
+    <header class="intelHeader">
 
-        <div class="intelTitle">
-          TERRA X / INTELLIGENCE
-          <small>GEOSPATIAL ANALYSIS SYSTEM</small>
+      <div class="intelTitle">
+        TERRA X / INTELLIGENCE
+        <small>GEOSPATIAL ANALYSIS PLATFORM</small>
+      </div>
+
+      <button
+        class="closeIntel"
+        onclick="closeIntelligence()"
+      >
+        ← الخريطة
+      </button>
+
+    </header>
+
+    <div class="intelMapArea">
+
+      <div id="intelMap"></div>
+
+      <div class="targetBadge">
+        TARGET:
+        <b id="targetName">
+          GLOBAL VIEW
+        </b>
+      </div>
+
+      <div class="intelScroll">
+
+        <div class="statsGrid">
+
+          <div class="stat">
+            <div class="statLabel">
+              POPULATION
+            </div>
+            <div
+              id="populationValue"
+              class="statValue"
+            >
+              —
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="statLabel">
+              BUILDINGS
+            </div>
+            <div
+              id="buildingValue"
+              class="statValue"
+            >
+              —
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="statLabel">
+              AREA
+            </div>
+            <div
+              id="areaValue"
+              class="statValue"
+            >
+              —
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="statLabel">
+              DENSITY
+            </div>
+            <div
+              id="densityValue"
+              class="statValue"
+            >
+              —
+            </div>
+          </div>
+
         </div>
 
-        <button
-          class="closeIntel"
-          onclick="closeIntelligence()"
-        >
-          ← الخريطة
-        </button>
 
-      </header>
+        <div class="analysisBox">
 
-      <div class="intelMapArea">
+          <div class="analysisTop">
 
-        <div id="intelMap"></div>
+            <span id="analysisStatus">
+              SYSTEM READY
+            </span>
 
-        <div class="targetBadge">
-          TARGET:
-          <b id="targetName">GLOBAL VIEW</b>
+            <span id="analysisPercent">
+              100%
+            </span>
+
+          </div>
+
+          <div class="progress">
+            <div
+              id="progressBar"
+              class="progressBar"
+              style="width:100%"
+            ></div>
+          </div>
+
         </div>
 
-        <div class="intelScroll">
 
-          <!-- STATS -->
+        <div class="actionGrid">
 
-          <div class="statsGrid">
-
-            <div class="stat">
-              <div class="statLabel">POPULATION</div>
-              <div
-                id="populationValue"
-                class="statValue"
-              >
-                —
-              </div>
-            </div>
-
-            <div class="stat">
-              <div class="statLabel">BUILDINGS</div>
-              <div
-                id="buildingValue"
-                class="statValue"
-              >
-                —
-              </div>
-            </div>
-
-            <div class="stat">
-              <div class="statLabel">AREA</div>
-              <div
-                id="areaValue"
-                class="statValue"
-              >
-                —
-              </div>
-            </div>
-
-            <div class="stat">
-              <div class="statLabel">DENSITY</div>
-              <div
-                id="densityValue"
-                class="statValue"
-              >
-                —
-              </div>
-            </div>
-
-          </div>
-
-
-          <!-- ANALYSIS -->
-
-          <div class="analysisBox">
-
-            <div class="analysisTop">
-              <span id="analysisStatus">
-                SYSTEM READY
-              </span>
-
-              <span id="analysisPercent">
-                0%
-              </span>
-            </div>
-
-            <div class="progress">
-              <div
-                id="progressBar"
-                class="progressBar"
-              ></div>
-            </div>
-
-          </div>
-
-
-          <!-- ACTIONS -->
-
-          <div class="actionGrid">
-
-            <button
-              class="actionBtn"
-              onclick="populationAnalysis()"
-            >
-              👥 Population AI
-            </button>
-
-            <button
-              class="actionBtn"
-              onclick="buildingAnalysis()"
-            >
-              🏢 Building Analysis
-            </button>
-
-            <button
-              class="actionBtn"
-              onclick="vegetationAnalysis()"
-            >
-              🌿 Vegetation
-            </button>
-
-            <button
-              class="actionBtn"
-              onclick="satelliteCompare()"
-            >
-              🛰️ Satellite Compare
-            </button>
-
-            <button
-              class="actionBtn"
-              onclick="startDrawing()"
-            >
-              📐 Draw Area
-            </button>
-
-            <button
-              class="actionBtn"
-              onclick="getLocation()"
-            >
-              📍 My Location
-            </button>
-
-          </div>
-
-
-          <!-- TIMELINE -->
-
-          <div class="timeline">
-
-            <button
-              class="yearBtn"
-              onclick="selectYear('2015',this)"
-            >
-              2015
-            </button>
-
-            <button
-              class="yearBtn"
-              onclick="selectYear('2020',this)"
-            >
-              2020
-            </button>
-
-            <button
-              class="yearBtn"
-              onclick="selectYear('2025',this)"
-            >
-              2025
-            </button>
-
-            <button
-              class="yearBtn active"
-              onclick="selectYear('Latest',this)"
-            >
-              Latest
-            </button>
-
-          </div>
-
-
-          <!-- RESULT -->
-
-          <div
-            id="resultBox"
-            class="resultBox"
+          <button
+            class="actionBtn"
+            onclick="populationAnalysis()"
           >
-            <strong>TERRA X:</strong>
-            اختر إحدى أدوات التحليل لبدء الفحص.
-          </div>
+            👥 Population AI
+          </button>
 
+          <button
+            class="actionBtn"
+            onclick="buildingAnalysis()"
+          >
+            🏢 Buildings
+          </button>
+
+          <button
+            class="actionBtn"
+            onclick="placeAnalysis()"
+          >
+            📍 Target Data
+          </button>
+
+          <button
+            class="actionBtn"
+            onclick="vegetationAnalysis()"
+          >
+            🌿 Vegetation
+          </button>
+
+          <button
+            class="actionBtn"
+            onclick="satelliteCompare()"
+          >
+            🛰️ Compare
+          </button>
+
+          <button
+            class="actionBtn"
+            onclick="startDrawing()"
+          >
+            📐 Draw Area
+          </button>
+
+          <button
+            class="actionBtn"
+            onclick="measureDistance()"
+          >
+            📏 Distance
+          </button>
+
+          <button
+            class="actionBtn"
+            onclick="saveProject()"
+          >
+            💾 Save
+          </button>
+
+          <button
+            class="actionBtn"
+            onclick="getLocation()"
+          >
+            📍 My Location
+          </button>
+
+        </div>
+
+
+        <div class="timeline">
+
+          <button
+            class="yearBtn"
+            onclick="selectYear('2015',this)"
+          >
+            2015
+          </button>
+
+          <button
+            class="yearBtn"
+            onclick="selectYear('2020',this)"
+          >
+            2020
+          </button>
+
+          <button
+            class="yearBtn"
+            onclick="selectYear('2025',this)"
+          >
+            2025
+          </button>
+
+          <button
+            class="yearBtn active"
+            onclick="selectYear('Latest',this)"
+          >
+            Latest
+          </button>
+
+        </div>
+
+
+        <div
+          id="resultBox"
+          class="resultBox"
+        >
+          <strong>TERRA X:</strong>
+          النظام جاهز. اختر منطقة أو أداة تحليل.
         </div>
 
       </div>
 
     </div>
 
-  </section>
+  </div>
+
+</section>
+
+
+<div id="toast"></div>
 
 </div>
 
@@ -747,14 +892,13 @@ button{
 <script>
 
 /* =====================================================
-   TERRA X 4.0
-   SINGLE FILE
+   TERRA X 5.0 ENGINE
 ===================================================== */
 
 
-/* =========================
-   MAP LAYERS
-========================= */
+/* =====================================================
+   BASE MAPS
+===================================================== */
 
 const street = L.tileLayer(
   "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -781,9 +925,9 @@ const terrain = L.tileLayer(
 );
 
 
-/* =========================
-   NORMAL MAP
-========================= */
+/* =====================================================
+   MAPS
+===================================================== */
 
 const map = L.map(
   "map",
@@ -793,11 +937,6 @@ const map = L.map(
     layers:[street]
   }
 );
-
-
-/* =========================
-   INTELLIGENCE MAP
-========================= */
 
 const intelMap = L.map(
   "intelMap",
@@ -810,22 +949,9 @@ const intelMap = L.map(
 );
 
 
-/* =========================
-   VARIABLES
-========================= */
-
-let currentLayer = "street";
-
-let userLocation = null;
-let userMarker = null;
-let accuracyCircle = null;
-
-let intelMarker = null;
-
-let drawing = false;
-let points = [];
-let pointMarkers = [];
-let polygon = null;
+/* =====================================================
+   STATE
+===================================================== */
 
 let currentTarget = {
   name:"GLOBAL VIEW",
@@ -833,10 +959,31 @@ let currentTarget = {
   lon:35.91
 };
 
+let currentLayer = "street";
 
-/* =========================
-   LAYER SWITCHER
-========================= */
+let userLocation = null;
+let userMarker = null;
+let accuracyCircle = null;
+
+let targetMarker = null;
+
+let searchMarkers = [];
+
+let drawing = false;
+let measuring = false;
+
+let points = [];
+let pointMarkers = [];
+
+let polygon = null;
+let measureLine = null;
+
+let lastSearchTime = 0;
+
+
+/* =====================================================
+   LAYER SWITCH
+===================================================== */
 
 function setLayer(type){
 
@@ -846,34 +993,50 @@ function setLayer(type){
 
   document
     .querySelectorAll(".layerBtn")
-    .forEach(btn => btn.classList.remove("active"));
+    .forEach(
+      b => b.classList.remove("active")
+    );
 
   if(type === "street"){
+
     street.addTo(map);
-    document.getElementById("streetBtn").classList.add("active");
+
+    document
+      .getElementById("streetBtn")
+      .classList.add("active");
   }
 
   if(type === "satellite"){
+
     satellite.addTo(map);
-    document.getElementById("satelliteBtn").classList.add("active");
+
+    document
+      .getElementById("satelliteBtn")
+      .classList.add("active");
   }
 
   if(type === "terrain"){
+
     terrain.addTo(map);
-    document.getElementById("terrainBtn").classList.add("active");
+
+    document
+      .getElementById("terrainBtn")
+      .classList.add("active");
   }
 
   currentLayer = type;
 }
 
 
-/* =========================
-   INTELLIGENCE OPEN/CLOSE
-========================= */
+/* =====================================================
+   INTELLIGENCE OPEN
+===================================================== */
 
 function openIntelligence(){
 
-  document.getElementById("intelScreen").style.display = "block";
+  document
+    .getElementById("intelScreen")
+    .style.display = "block";
 
   setTimeout(() => {
 
@@ -888,37 +1051,69 @@ function openIntelligence(){
 }
 
 
+/* =====================================================
+   INTELLIGENCE CLOSE
+===================================================== */
+
 function closeIntelligence(){
 
-  document.getElementById("intelScreen").style.display = "none";
-
+  document
+    .getElementById("intelScreen")
+    .style.display = "none";
 }
 
 
-/* =========================
-   SEARCH
-========================= */
+/* =====================================================
+   SMART SEARCH
+===================================================== */
 
-async function searchPlace(){
+async function smartSearch(){
 
   const input =
-    document.getElementById("searchInput");
+    document.getElementById(
+      "searchInput"
+    );
 
-  const query = input.value.trim();
+  const query =
+    input.value.trim();
 
   if(!query){
-    alert("اكتب اسم مكان أولاً.");
+
+    showToast(
+      "اكتب اسم مكان أولاً."
+    );
+
     return;
   }
 
-  setAnalysis("SEARCHING LOCATION",10);
+  const now = Date.now();
+
+  if(now-lastSearchTime < 1100){
+
+    showToast(
+      "انتظر لحظة قبل إجراء بحث آخر."
+    );
+
+    return;
+  }
+
+  lastSearchTime = now;
+
+  closeResults();
+
+  setAnalysis(
+    "SEARCHING GLOBAL DATABASE",
+    20
+  );
 
   try{
 
     const url =
       "https://nominatim.openstreetmap.org/search" +
       "?format=jsonv2" +
-      "&limit=1" +
+      "&addressdetails=1" +
+      "&namedetails=1" +
+      "&limit=8" +
       "&q=" +
       encodeURIComponent(query);
 
@@ -926,117 +1121,277 @@ async function searchPlace(){
       await fetch(url);
 
     if(!response.ok){
-      throw new Error("Search failed");
+
+      throw new Error(
+        "Nominatim request failed"
+      );
     }
 
     const data =
       await response.json();
 
     if(!data.length){
-      alert("لم يتم العثور على المكان.");
-      setAnalysis("NO RESULT",0);
+
+      setAnalysis(
+        "NO RESULTS",
+        0
+      );
+
+      showToast(
+        "لم يتم العثور على نتائج."
+      );
+
       return;
     }
 
-    const place = data[0];
+    setAnalysis(
+      "RESULTS ACQUIRED",
+      100
+    );
 
-    const lat = parseFloat(place.lat);
-    const lon = parseFloat(place.lon);
-
-    currentTarget = {
-      name:place.display_name,
-      lat:lat,
-      lon:lon
-    };
-
-    map.setView([lat,lon],14);
-
-    intelMap.setView([lat,lon],14);
-
-    if(userMarker){
-      // keep user marker
-    }
-
-    if(intelMarker){
-      intelMap.removeLayer(intelMarker);
-    }
-
-    intelMarker =
-      L.marker([lat,lon])
-      .addTo(intelMap)
-      .bindPopup(
-        "<b>TERRA X TARGET</b><br>" +
-        escapeHtml(place.display_name)
-      );
-
-    intelMarker.openPopup();
-
-    document.getElementById("targetName").innerText =
-      place.display_name
-        .split(",")
-        .slice(0,2)
-        .join(",");
-
-    setAnalysis("TARGET ACQUIRED",100);
-
-    document.getElementById("resultBox").innerHTML =
-      "<strong>TARGET ACQUIRED</strong><br>" +
-      escapeHtml(place.display_name) +
-      "<br><br>" +
-      "LAT: " + lat.toFixed(6) +
-      "<br>" +
-      "LON: " + lon.toFixed(6);
-
-    openIntelligence();
+    showResults(data);
 
   }catch(error){
 
     console.error(error);
 
-    alert(
-      "حدث خطأ أثناء البحث. حاول مرة أخرى."
+    setAnalysis(
+      "SEARCH ERROR",
+      0
     );
 
-    setAnalysis("SEARCH ERROR",0);
+    showToast(
+      "حدث خطأ أثناء البحث."
+    );
   }
 }
 
 
-/* =========================
-   ENTER KEY SEARCH
-========================= */
+/* =====================================================
+   SHOW SEARCH RESULTS
+===================================================== */
 
-document
-  .getElementById("searchInput")
-  .addEventListener(
-    "keydown",
-    function(event){
+function showResults(data){
 
-      if(event.key === "Enter"){
-        searchPlace();
-      }
+  const panel =
+    document.getElementById(
+      "resultsPanel"
+    );
+
+  panel.innerHTML = "";
+
+  data.forEach(
+    (place,index) => {
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "resultItem";
+
+      item.innerHTML = `
+        <div class="resultName">
+          ${escapeHtml(place.display_name)}
+        </div>
+
+        <div class="resultMeta">
+          ${escapeHtml(
+            place.type || "place"
+          )}
+          ·
+          ${parseFloat(place.lat).toFixed(5)},
+          ${parseFloat(place.lon).toFixed(5)}
+        </div>
+
+        <button
+          class="resultOpen"
+          onclick="openSearchResult(${index})"
+        >
+          فتح على الخريطة
+        </button>
+      `;
+
+      panel.appendChild(item);
 
     }
   );
 
+  window.latestSearchResults = data;
 
-/* =========================
-   GEOLOCATION
-========================= */
+  panel.style.display = "block";
+}
+
+
+/* =====================================================
+   OPEN SEARCH RESULT
+===================================================== */
+
+function openSearchResult(index){
+
+  const data =
+    window.latestSearchResults;
+
+  if(!data || !data[index])
+    return;
+
+  const place =
+    data[index];
+
+  const lat =
+    parseFloat(place.lat);
+
+  const lon =
+    parseFloat(place.lon);
+
+  currentTarget = {
+    name:place.display_name,
+    lat:lat,
+    lon:lon
+  };
+
+  map.setView(
+    [lat,lon],
+    15
+  );
+
+  setTarget(
+    place.display_name,
+    lat,
+    lon
+  );
+
+  closeResults();
+
+  document.getElementById(
+    "resultBox"
+  ).innerHTML =
+    "<strong>TARGET ACQUIRED</strong><br>" +
+    escapeHtml(place.display_name) +
+    "<br><br>" +
+    "LAT: " +
+    lat.toFixed(6) +
+    "<br>" +
+    "LON: " +
+    lon.toFixed(6);
+
+  openIntelligence();
+}
+
+
+/* =====================================================
+   SET TARGET
+===================================================== */
+
+function setTarget(
+  name,
+  lat,
+  lon
+){
+
+  currentTarget = {
+    name:name,
+    lat:lat,
+    lon:lon
+  };
+
+  document.getElementById(
+    "targetName"
+  ).innerText =
+    shortenName(name);
+
+  intelMap.setView(
+    [lat,lon],
+    15
+  );
+
+  if(targetMarker){
+
+    intelMap.removeLayer(
+      targetMarker
+    );
+  }
+
+  targetMarker =
+    L.marker([lat,lon])
+    .addTo(intelMap)
+    .bindPopup(
+      "<b>TERRA X TARGET</b><br>" +
+      escapeHtml(name)
+    );
+}
+
+
+/* =====================================================
+   CATEGORY SEARCH
+===================================================== */
+
+async function categorySearch(type){
+
+  let query = "";
+
+  const targetText =
+    currentTarget.name !== "GLOBAL VIEW"
+      ? currentTarget.name
+      : "الخريطة الحالية";
+
+  if(type === "hospital")
+    query = "hospitals near " + targetText;
+
+  if(type === "school")
+    query = "schools near " + targetText;
+
+  if(type === "university")
+    query = "universities near " + targetText;
+
+  if(type === "pharmacy")
+    query = "pharmacies near " + targetText;
+
+  if(type === "restaurant")
+    query = "restaurants near " + targetText;
+
+  if(type === "hotel")
+    query = "hotels near " + targetText;
+
+  if(type === "mosque")
+    query = "mosques near " + targetText;
+
+  document.getElementById(
+    "searchInput"
+  ).value = query;
+
+  await smartSearch();
+}
+
+
+/* =====================================================
+   CLEAR RESULTS
+===================================================== */
+
+function closeResults(){
+
+  document.getElementById(
+    "resultsPanel"
+  ).style.display = "none";
+}
+
+
+/* =====================================================
+   GPS
+===================================================== */
 
 function getLocation(){
 
   if(!navigator.geolocation){
 
-    alert(
-      "تحديد الموقع غير مدعوم في هذا المتصفح."
+    showToast(
+      "المتصفح لا يدعم GPS."
     );
 
     return;
   }
 
   setAnalysis(
-    "ACQUIRING GPS LOCATION",
+    "ACQUIRING GPS",
     15
   );
 
@@ -1053,18 +1408,21 @@ function getLocation(){
       const accuracy =
         position.coords.accuracy;
 
-      userLocation = [lat,lon];
+      userLocation = [
+        lat,
+        lon
+      ];
 
-      if(userMarker){
+      if(userMarker)
         map.removeLayer(userMarker);
-      }
 
-      if(accuracyCircle){
+      if(accuracyCircle)
         map.removeLayer(accuracyCircle);
-      }
 
       userMarker =
-        L.marker(userLocation)
+        L.marker(
+          userLocation
+        )
         .addTo(map)
         .bindPopup(
           "📍 موقعك الحالي"
@@ -1080,34 +1438,14 @@ function getLocation(){
 
       map.setView(
         userLocation,
-        15
+        16
       );
 
-      intelMap.setView(
-        userLocation,
-        15
+      setTarget(
+        "MY LOCATION",
+        lat,
+        lon
       );
-
-      currentTarget = {
-        name:"MY LOCATION",
-        lat:lat,
-        lon:lon
-      };
-
-      document.getElementById(
-        "targetName"
-      ).innerText = "MY LOCATION";
-
-      if(intelMarker){
-        intelMap.removeLayer(intelMarker);
-      }
-
-      intelMarker =
-        L.marker(userLocation)
-        .addTo(intelMap)
-        .bindPopup(
-          "📍 TERRA X USER LOCATION"
-        );
 
       setAnalysis(
         "GPS LOCK ACQUIRED",
@@ -1118,9 +1456,11 @@ function getLocation(){
         "resultBox"
       ).innerHTML =
         "<strong>GPS LOCATION</strong><br>" +
-        "Latitude: " + lat.toFixed(6) +
+        "Latitude: " +
+        lat.toFixed(6) +
         "<br>" +
-        "Longitude: " + lon.toFixed(6) +
+        "Longitude: " +
+        lon.toFixed(6) +
         "<br>" +
         "Accuracy: ±" +
         Math.round(accuracy) +
@@ -1139,10 +1479,9 @@ function getLocation(){
         0
       );
 
-      alert(
-        "تعذر تحديد موقعك. تأكد من السماح للموقع للمتصفح."
+      showToast(
+        "تعذر تحديد الموقع. تأكد من إعطاء الموقع إذنًا."
       );
-
     },
 
     {
@@ -1150,97 +1489,110 @@ function getLocation(){
       timeout:15000,
       maximumAge:0
     }
-
   );
 }
 
 
-/* =========================
-   ANALYSIS STATUS
-========================= */
+/* =====================================================
+   TARGET DATA
+===================================================== */
 
-function setAnalysis(
-  status,
-  percent
-){
+async function placeAnalysis(){
 
-  document.getElementById(
-    "analysisStatus"
-  ).innerText = status;
+  const lat =
+    currentTarget.lat;
 
-  document.getElementById(
-    "analysisPercent"
-  ).innerText =
-    percent + "%";
-
-  document.getElementById(
-    "progressBar"
-  ).style.width =
-    percent + "%";
-}
-
-
-/* =========================
-   POPULATION AI
-========================= */
-
-function populationAnalysis(){
+  const lon =
+    currentTarget.lon;
 
   setAnalysis(
-    "RUNNING POPULATION MODEL",
-    20
+    "LOADING TARGET DATA",
+    40
   );
 
-  document.getElementById(
-    "resultBox"
-  ).innerHTML =
-    "<strong>POPULATION AI</strong><br>" +
-    "يتم تجهيز تقدير سكاني للمنطقة المستهدفة...";
+  try{
 
-  setTimeout(() => {
+    const url =
+      "https://nominatim.openstreetmap.org/reverse" +
+      "?format=jsonv2" +
+      "&lat=" + lat +
+      "&lon=" + lon +
+      "&addressdetails=1";
 
-    setAnalysis(
-      "ANALYSING URBAN DENSITY",
-      50
-    );
+    const response =
+      await fetch(url);
 
-  },500);
+    if(!response.ok)
+      throw new Error();
 
-  setTimeout(() => {
+    const data =
+      await response.json();
 
-    setAnalysis(
-      "MODEL READY",
-      100
-    );
-
-    document.getElementById(
-      "populationValue"
-    ).innerText = "EST.";
-
-    document.getElementById(
-      "densityValue"
-    ).innerText = "EST.";
+    const address =
+      data.address || {};
 
     document.getElementById(
       "resultBox"
     ).innerHTML =
-      "<strong>POPULATION ESTIMATION</strong><br>" +
-      "هذه واجهة تقدير وليست عدًّا مباشرًا للأشخاص.<br><br>" +
-      "النسخة الحالية لا تعرض رقمًا مختلقًا. " +
-      "سيتم ربطها لاحقًا بمصدر بيانات سكاني حقيقي.";
+      "<strong>TARGET DATA</strong><br>" +
+      escapeHtml(
+        data.display_name ||
+        currentTarget.name
+      ) +
+      "<br><br>" +
+      "Country: " +
+      escapeHtml(
+        address.country || "—"
+      ) +
+      "<br>" +
+      "State: " +
+      escapeHtml(
+        address.state || "—"
+      ) +
+      "<br>" +
+      "City: " +
+      escapeHtml(
+        address.city ||
+        address.town ||
+        address.village ||
+        "—"
+      ) +
+      "<br><br>" +
+      "LAT: " +
+      lat.toFixed(6) +
+      "<br>" +
+      "LON: " +
+      lon.toFixed(6);
 
-  },1200);
+    setAnalysis(
+      "TARGET DATA READY",
+      100
+    );
+
+  }catch(error){
+
+    setAnalysis(
+      "TARGET DATA FAILED",
+      0
+    );
+  }
 }
 
 
-/* =========================
+/* =====================================================
    BUILDING ANALYSIS
-========================= */
+===================================================== */
 
 async function buildingAnalysis(){
 
+  const lat =
+    currentTarget.lat;
+
+  const lon =
+    currentTarget.lon;
+
   setAnalysis(
-    "SCANNING OPENSTREETMAP",
+    "SCANNING BUILDINGS",
     15
   );
 
@@ -1248,183 +1600,195 @@ async function buildingAnalysis(){
     "resultBox"
   ).innerHTML =
     "<strong>BUILDING ANALYSIS</strong><br>" +
-    "جارٍ البحث عن المباني المسجلة حول الهدف...";
+    "جارٍ تحليل المباني المسجلة حول الهدف...";
 
-  try{
+  const query = `
+    [out:json][timeout:25];
+    (
+      way["building"](around:2000,${lat},${lon});
+      relation["building"](around:2000,${lat},${lon});
+    );
+    out center tags;
+  `;
 
-    const lat =
-      currentTarget.lat;
+  const servers = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter"
+  ];
 
-    const lon =
-      currentTarget.lon;
+  let data = null;
 
-    const query = `
-      [out:json][timeout:25];
-      (
-        way["building"](around:2000,${lat},${lon});
-      );
-      out ids center;
-    `;
+  for(
+    const server of servers
+  ){
 
-    const servers = [
-      "https://overpass-api.de/api/interpreter",
-      "https://overpass.kumi.systems/api/interpreter",
-      "https://overpass.private.coffee/api/interpreter"
-    ];
+    try{
 
-    let data = null;
-
-    for(const server of servers){
-
-      try{
-
-        const response =
-          await fetch(
-            server +
-            "?data=" +
-            encodeURIComponent(query),
-            {
-              headers:{
-                "Accept":
-                "application/json"
-              }
-            }
-          );
-
-        if(response.ok){
-
-          data =
-            await response.json();
-
-          break;
-        }
-
-      }catch(error){
-
-        console.log(
-          "Overpass failed:",
-          server
+      const response =
+        await fetch(
+          server +
+          "?data=" +
+          encodeURIComponent(query)
         );
 
+      if(response.ok){
+
+        data =
+          await response.json();
+
+        break;
       }
 
-    }
+    }catch(error){
 
-    if(!data){
-
-      throw new Error(
-        "No Overpass server"
+      console.log(
+        "Overpass failed",
+        server
       );
-
     }
+  }
 
-    const count =
-      data.elements.length;
-
-    setAnalysis(
-      "BUILDING SCAN COMPLETE",
-      100
-    );
-
-    document.getElementById(
-      "buildingValue"
-    ).innerText =
-      count.toLocaleString();
-
-    document.getElementById(
-      "resultBox"
-    ).innerHTML =
-      "<strong>BUILDING ANALYSIS</strong><br>" +
-      "المباني المسجلة ضمن دائرة تقريبية 2 كم حول الهدف:<br><br>" +
-      "<strong>" +
-      count.toLocaleString() +
-      "</strong> مبنى<br><br>" +
-      "المصدر: OpenStreetMap / Overpass";
-
-  }catch(error){
-
-    console.error(error);
+  if(!data){
 
     setAnalysis(
       "BUILDING SCAN FAILED",
       0
     );
 
-    document.getElementById(
-      "resultBox"
-    ).innerHTML =
-      "<strong>BUILDING ANALYSIS</strong><br>" +
-      "تعذر الوصول إلى خدمة بيانات المباني حاليًا.";
+    showToast(
+      "تعذر الوصول إلى بيانات المباني."
+    );
 
+    return;
   }
+
+  const count =
+    data.elements.length;
+
+  document.getElementById(
+    "buildingValue"
+  ).innerText =
+    count.toLocaleString();
+
+  setAnalysis(
+    "BUILDING SCAN COMPLETE",
+    100
+  );
+
+  document.getElementById(
+    "resultBox"
+  ).innerHTML =
+    "<strong>BUILDING ANALYSIS</strong><br>" +
+    "المباني المسجلة ضمن نطاق تقريبي 2 كم:<br><br>" +
+    "<strong>" +
+    count.toLocaleString() +
+    "</strong> مبنى<br><br>" +
+    "المصدر: OpenStreetMap / Overpass.";
 
 }
 
 
-/* =========================
-   VEGETATION ANALYSIS
-========================= */
+/* =====================================================
+   POPULATION
+===================================================== */
+
+function populationAnalysis(){
+
+  setAnalysis(
+    "POPULATION MODEL",
+    30
+  );
+
+  document.getElementById(
+    "resultBox"
+  ).innerHTML =
+    "<strong>POPULATION AI</strong><br>" +
+    "TERRA X يميز بين الرقم السكاني الموثق والتقدير.<br><br>" +
+    "لا يتم اختلاق عدد سكان من صور الأقمار الصناعية. " +
+    "هذه الخانة ستعرض بيانات سكانية فعلية عندما يتوفر مصدر مناسب للمنطقة.";
+
+  document.getElementById(
+    "populationValue"
+  ).innerText =
+    "DATA";
+
+  setTimeout(
+    () => {
+      setAnalysis(
+        "POPULATION MODULE READY",
+        100
+      );
+    },
+    700
+  );
+}
+
+
+/* =====================================================
+   VEGETATION
+===================================================== */
 
 function vegetationAnalysis(){
 
   setAnalysis(
-    "VEGETATION ANALYSIS",
-    30
+    "VEGETATION MODULE",
+    40
   );
 
   document.getElementById(
     "resultBox"
   ).innerHTML =
     "<strong>VEGETATION ANALYSIS</strong><br>" +
-    "واجهة التحليل جاهزة، لكن لا يتم اختلاق نسبة الغطاء النباتي.<br><br>" +
-    "المرحلة القادمة يمكن ربطها ببيانات Sentinel / Landsat لحساب مؤشرات مثل NDVI.";
+    "المحرك جاهز لإضافة بيانات الأقمار الصناعية والمؤشرات النباتية مثل NDVI.<br><br>" +
+    "لا يتم عرض نسبة وهمية بدون مصدر بيانات فعلي.";
 
-  setTimeout(() => {
-
-    setAnalysis(
-      "ANALYSIS READY",
-      100
-    );
-
-  },900);
-
+  setTimeout(
+    () => {
+      setAnalysis(
+        "VEGETATION MODULE READY",
+        100
+      );
+    },
+    700
+  );
 }
 
 
-/* =========================
+/* =====================================================
    SATELLITE COMPARE
-========================= */
+===================================================== */
 
 function satelliteCompare(){
 
   setAnalysis(
-    "SATELLITE COMPARISON",
-    30
+    "SATELLITE MODULE",
+    40
   );
 
   document.getElementById(
     "resultBox"
   ).innerHTML =
     "<strong>SATELLITE COMPARE</strong><br>" +
-    "الخريطة الحالية تعرض أحدث طبقة متاحة من المصدر المستخدم.<br><br>" +
-    "2015 / 2020 / 2025 / Latest ظاهرة كواجهة زمنية، " +
-    "لكن لا يتم الادعاء بأن هذه الطبقات التاريخية متوفرة من Esri تلقائيًا.";
+    "الطبقة الحالية: Satellite imagery.<br><br>" +
+    "المخطط الزمني موجود، لكن السنوات التاريخية لا يتم اختلاقها. " +
+    "سنربطه لاحقًا بمصدر تاريخي فعلي يدعم المقارنة.";
 
-  setTimeout(() => {
-
-    setAnalysis(
-      "COMPARE MODULE READY",
-      100
-    );
-
-  },900);
-
+  setTimeout(
+    () => {
+      setAnalysis(
+        "SATELLITE MODULE READY",
+        100
+      );
+    },
+    700
+  );
 }
 
 
-/* =========================
+/* =====================================================
    TIMELINE
-========================= */
+===================================================== */
 
 function selectYear(
   year,
@@ -1434,16 +1798,10 @@ function selectYear(
   document
     .querySelectorAll(".yearBtn")
     .forEach(
-      btn =>
-      btn.classList.remove("active")
+      b => b.classList.remove("active")
     );
 
   button.classList.add("active");
-
-  setAnalysis(
-    "SELECTED " + year,
-    100
-  );
 
   document.getElementById(
     "resultBox"
@@ -1452,65 +1810,50 @@ function selectYear(
     "Selected: " +
     year +
     "<br><br>" +
-    "الواجهة الزمنية جاهزة للربط بمصدر صور تاريخية فعلي.";
+    "هذه واجهة زمنية، ولا يتم الادعاء بأن الطبقة التاريخية لهذه السنة محملة حاليًا.";
 
+  setAnalysis(
+    "TIMELINE: " + year,
+    100
+  );
 }
 
 
-/* =========================
+/* =====================================================
    DRAW AREA
-========================= */
+===================================================== */
 
 function startDrawing(){
 
   openIntelligence();
 
+  resetTools();
+
   drawing = true;
-
-  points = [];
-
-  pointMarkers.forEach(
-    marker =>
-    intelMap.removeLayer(marker)
-  );
-
-  pointMarkers = [];
-
-  if(polygon){
-
-    intelMap.removeLayer(
-      polygon
-    );
-
-    polygon = null;
-  }
-
-  setAnalysis(
-    "DRAW MODE ACTIVE",
-    20
-  );
 
   document.getElementById(
     "resultBox"
   ).innerHTML =
     "<strong>DRAW AREA</strong><br>" +
     "اضغط على الخريطة لإضافة النقاط.<br>" +
-    "أضف 3 نقاط أو أكثر لإغلاق المنطقة.";
+    "أضف 3 نقاط على الأقل لإغلاق المنطقة.";
+
+  setAnalysis(
+    "DRAW MODE ACTIVE",
+    20
+  );
 
   intelMap.once(
     "click",
-    addPoint
+    addDrawPoint
   );
 }
 
 
-/* =========================
-   ADD DRAW POINT
-========================= */
+function addDrawPoint(e){
 
-function addPoint(e){
-
-  if(!drawing) return;
+  if(!drawing)
+    return;
 
   points.push([
     e.latlng.lat,
@@ -1529,27 +1872,24 @@ function addPoint(e){
 
   if(points.length >= 3){
 
-    if(polygon){
-
-      intelMap.removeLayer(
-        polygon
-      );
-    }
+    if(polygon)
+      intelMap.removeLayer(polygon);
 
     polygon =
       L.polygon(
         points,
         {
-          fillOpacity:.18
+          color:"#31d8ff",
+          fillOpacity:.16
         }
       ).addTo(intelMap);
 
-    calculateArea();
-
     drawing = false;
 
+    calculateArea();
+
     setAnalysis(
-      "AREA ANALYSIS COMPLETE",
+      "AREA COMPLETE",
       100
     );
 
@@ -1564,19 +1904,20 @@ function addPoint(e){
 
     intelMap.once(
       "click",
-      addPoint
+      addDrawPoint
     );
   }
 }
 
 
-/* =========================
-   AREA CALCULATION
-========================= */
+/* =====================================================
+   AREA
+===================================================== */
 
 function calculateArea(){
 
-  if(!polygon) return;
+  if(!polygon)
+    return;
 
   const latlngs =
     polygon.getLatLngs()[0];
@@ -1608,13 +1949,13 @@ function calculateArea(){
     12364 /
     2;
 
-  const rounded =
+  const value =
     area.toFixed(2);
 
   document.getElementById(
     "areaValue"
   ).innerText =
-    rounded + " km²";
+    value + " km²";
 
   document.getElementById(
     "resultBox"
@@ -1622,33 +1963,389 @@ function calculateArea(){
     "<strong>AREA ANALYSIS</strong><br>" +
     "Estimated area:<br><br>" +
     "<strong>" +
-    rounded +
+    value +
     " km²" +
     "</strong><br><br>" +
-    "تم حساب المساحة تقريبياً من المضلع المرسوم.";
-
+    "المساحة تقريبية حسب المضلع المرسوم.";
 }
 
 
-/* =========================
-   ESCAPE HTML
-========================= */
+/* =====================================================
+   DISTANCE MEASURE
+===================================================== */
+
+function measureDistance(){
+
+  openIntelligence();
+
+  resetTools();
+
+  measuring = true;
+
+  document.getElementById(
+    "resultBox"
+  ).innerHTML =
+    "<strong>DISTANCE TOOL</strong><br>" +
+    "اضغط نقطتين على الخريطة لحساب المسافة.";
+
+  setAnalysis(
+    "DISTANCE MODE",
+    20
+  );
+
+  intelMap.once(
+    "click",
+    addMeasurePoint
+  );
+}
+
+
+function addMeasurePoint(e){
+
+  if(!measuring)
+    return;
+
+  points.push([
+    e.latlng.lat,
+    e.latlng.lng
+  ]);
+
+  const marker =
+    L.circleMarker(
+      e.latlng,
+      {
+        radius:6
+      }
+    ).addTo(intelMap);
+
+  pointMarkers.push(marker);
+
+  if(points.length === 2){
+
+    measureLine =
+      L.polyline(
+        points,
+        {
+          color:"#31d8ff"
+        }
+      ).addTo(intelMap);
+
+    const p1 =
+      L.latLng(
+        points[0][0],
+        points[0][1]
+      );
+
+    const p2 =
+      L.latLng(
+        points[1][0],
+        points[1][1]
+      );
+
+    const meters =
+      p1.distanceTo(p2);
+
+    const display =
+      meters >= 1000
+        ? (meters/1000).toFixed(2) +
+          " km"
+        : Math.round(meters) +
+          " m";
+
+    document.getElementById(
+      "resultBox"
+    ).innerHTML =
+      "<strong>DISTANCE</strong><br>" +
+      "Distance: <strong>" +
+      display +
+      "</strong>";
+
+    setAnalysis(
+      "DISTANCE COMPLETE",
+      100
+    );
+
+    measuring = false;
+
+  }else{
+
+    setAnalysis(
+      "POINT 1 / 2",
+      50
+    );
+
+    intelMap.once(
+      "click",
+      addMeasurePoint
+    );
+  }
+}
+
+
+/* =====================================================
+   RESET DRAW TOOLS
+===================================================== */
+
+function resetTools(){
+
+  drawing = false;
+  measuring = false;
+
+  points = [];
+
+  pointMarkers.forEach(
+    marker =>
+    intelMap.removeLayer(marker)
+  );
+
+  pointMarkers = [];
+
+  if(polygon){
+
+    intelMap.removeLayer(
+      polygon
+    );
+
+    polygon = null;
+  }
+
+  if(measureLine){
+
+    intelMap.removeLayer(
+      measureLine
+    );
+
+    measureLine = null;
+  }
+}
+
+
+/* =====================================================
+   SAVE PROJECT
+===================================================== */
+
+function saveProject(){
+
+  const project = {
+    name:
+      currentTarget.name,
+    lat:
+      currentTarget.lat,
+    lon:
+      currentTarget.lon,
+    savedAt:
+      new Date().toISOString(),
+    area:
+      document.getElementById(
+        "areaValue"
+      ).innerText,
+    buildings:
+      document.getElementById(
+        "buildingValue"
+      ).innerText
+  };
+
+  const old =
+    JSON.parse(
+      localStorage.getItem(
+        "terraXProjects"
+      ) || "[]"
+    );
+
+  old.unshift(project);
+
+  localStorage.setItem(
+    "terraXProjects",
+    JSON.stringify(
+      old.slice(0,20)
+    )
+  );
+
+  showToast(
+    "تم حفظ المشروع على هذا الجهاز."
+  );
+
+  document.getElementById(
+    "resultBox"
+  ).innerHTML =
+    "<strong>PROJECT SAVED</strong><br>" +
+    "تم حفظ المنطقة الحالية محليًا على الجهاز.<br><br>" +
+    escapeHtml(
+      currentTarget.name
+    );
+}
+
+
+/* =====================================================
+   AI COMMANDS
+===================================================== */
+
+function runAICommand(text){
+
+  const command =
+    text.toLowerCase().trim();
+
+  if(
+    command.includes("مباني") ||
+    command.includes("buildings")
+  ){
+
+    buildingAnalysis();
+    return;
+  }
+
+  if(
+    command.includes("مساحة") ||
+    command.includes("area")
+  ){
+
+    if(polygon)
+      calculateArea();
+    else
+      startDrawing();
+
+    return;
+  }
+
+  if(
+    command.includes("سكان") ||
+    command.includes("population")
+  ){
+
+    populationAnalysis();
+    return;
+  }
+
+  if(
+    command.includes("نبات") ||
+    command.includes("vegetation")
+  ){
+
+    vegetationAnalysis();
+    return;
+  }
+
+  smartSearch();
+}
+
+
+/* =====================================================
+   SEARCH ENTER
+===================================================== */
+
+document
+  .getElementById(
+    "searchInput"
+  )
+  .addEventListener(
+    "keydown",
+    event => {
+
+      if(event.key === "Enter")
+        smartSearch();
+
+    }
+  );
+
+
+/* =====================================================
+   ANALYSIS STATUS
+===================================================== */
+
+function setAnalysis(
+  status,
+  percent
+){
+
+  document.getElementById(
+    "analysisStatus"
+  ).innerText =
+    status;
+
+  document.getElementById(
+    "analysisPercent"
+  ).innerText =
+    percent + "%";
+
+  document.getElementById(
+    "progressBar"
+  ).style.width =
+    percent + "%";
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+function showToast(text){
+
+  const toast =
+    document.getElementById(
+      "toast"
+    );
+
+  toast.innerText =
+    text;
+
+  toast.style.display =
+    "block";
+
+  clearTimeout(
+    window.toastTimer
+  );
+
+  window.toastTimer =
+    setTimeout(
+      () => {
+        toast.style.display =
+          "none";
+      },
+      2600
+    );
+}
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function shortenName(name){
+
+  if(!name)
+    return "UNKNOWN";
+
+  const parts =
+    name.split(",");
+
+  if(parts.length <= 2)
+    return name;
+
+  return parts
+    .slice(0,2)
+    .join(",");
+}
+
 
 function escapeHtml(text){
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   div.textContent =
-    text;
+    text == null
+      ? ""
+      : String(text);
 
   return div.innerHTML;
 }
 
 
-/* =========================
+/* =====================================================
    MAP SYNC
-========================= */
+===================================================== */
 
 map.on(
   "moveend",
@@ -1657,7 +2354,7 @@ map.on(
     if(
       document.getElementById(
         "intelScreen"
-      ).style.display !== "none"
+      ).style.display === "block"
     ){
 
       intelMap.setView(
@@ -1667,24 +2364,34 @@ map.on(
           animate:false
         }
       );
-
     }
-
   }
 );
 
 
-/* =========================
-   INITIAL STATE
-========================= */
+/* =====================================================
+   INITIALIZE
+===================================================== */
 
 setAnalysis(
-  "SYSTEM READY",
+  "SYSTEM ONLINE",
   100
 );
 
 console.log(
-  "TERRA X 4.0 ONLINE"
+  "================================="
+);
+
+console.log(
+  "TERRA X 5.0 ONLINE"
+);
+
+console.log(
+  "GEOSPATIAL PLATFORM READY"
+);
+
+console.log(
+  "================================="
 );
 
 </script>
