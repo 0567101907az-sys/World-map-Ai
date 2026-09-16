@@ -1,816 +1,1305 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-  <title>TERRA X</title>
-
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #05070b;
-      color: white;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-    }
-
-    #map {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-    }
-
-    /* ================= HEADER ================= */
-
-    .topbar {
-      position: fixed;
-      top: 12px;
-      left: 12px;
-      right: 12px;
-      z-index: 1000;
-
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      padding: 10px 12px;
-
-      background: rgba(7, 10, 16, 0.90);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 18px;
-
-      backdrop-filter: blur(15px);
-      box-shadow: 0 10px 35px rgba(0,0,0,0.35);
-    }
-
-    .logo {
-      min-width: 92px;
-      text-align: center;
-    }
-
-    .logo-main {
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: 2px;
-    }
-
-    .logo-sub {
-      font-size: 8px;
-      color: #8e99aa;
-      letter-spacing: 1.5px;
-      margin-top: 2px;
-    }
-
-    .searchBox {
-      flex: 1;
-      display: flex;
-      gap: 6px;
-    }
-
-    #searchInput {
-      width: 100%;
-      min-width: 0;
-
-      border: 1px solid rgba(255,255,255,0.10);
-      outline: none;
-
-      background: rgba(255,255,255,0.07);
-      color: white;
-
-      border-radius: 12px;
-      padding: 12px;
-
-      font-size: 14px;
-    }
-
-    #searchInput::placeholder {
-      color: #8992a2;
-    }
-
-    .searchBtn {
-      width: 45px;
-      border: 0;
-      border-radius: 12px;
-      background: white;
-      color: #05070b;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    /* ================= BOTTOM PANEL ================= */
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>TERRA X</title>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#05070b;
+  color:white;
+  font-family:Arial,sans-serif;
+}
+
+#map{
+  position:fixed;
+  inset:0;
+  z-index:1;
+}
+
+/* ================= TOP ================= */
+
+.topbar{
+  position:fixed;
+  top:12px;
+  left:12px;
+  right:12px;
+  z-index:1000;
 
-    .bottomPanel {
-      position: fixed;
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
-      z-index: 1000;
-
-      background: rgba(7, 10, 16, 0.93);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 22px;
-
-      padding: 12px;
-
-      backdrop-filter: blur(18px);
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.35);
-    }
-
-    .handle {
-      width: 42px;
-      height: 4px;
-      border-radius: 10px;
-      background: #596273;
-      margin: 0 auto 12px;
-    }
-
-    .tools {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-
-    .tool {
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.055);
-      color: white;
-
-      border-radius: 15px;
-      padding: 11px 4px;
-
-      font-size: 11px;
-      text-align: center;
-    }
-
-    .tool span {
-      display: block;
-      font-size: 21px;
-      margin-bottom: 5px;
-    }
-
-    .tool:active {
-      transform: scale(0.96);
-    }
-
-    /* ================= LOCATION BUTTON ================= */
-
-    .locationBtn {
-      position: fixed;
-      right: 20px;
-      bottom: 205px;
-
-      z-index: 999;
-
-      width: 50px;
-      height: 50px;
-
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 16px;
-
-      background: rgba(7,10,16,0.92);
-      color: white;
-
-      font-size: 21px;
-
-      box-shadow: 0 8px 25px rgba(0,0,0,0.35);
-    }
-
-    /* ================= SIDE CARD ================= */
-
-    .infoCard {
-      position: fixed;
-      top: 92px;
-      left: 12px;
-      right: 12px;
-
-      z-index: 900;
-
-      display: none;
-
-      background: rgba(7,10,16,0.94);
-      border: 1px solid rgba(255,255,255,0.10);
-      border-radius: 20px;
-
-      padding: 15px;
-
-      backdrop-filter: blur(18px);
-      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    }
-
-    .infoTitle {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-
-    .infoText {
-      color: #aab3c2;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    .closeBtn {
-      float: left;
-      border: 0;
-      background: transparent;
-      color: #8992a2;
-      font-size: 18px;
-    }
-
-    /* ================= RESULTS ================= */
-
-    #results {
-      max-height: 170px;
-      overflow-y: auto;
-      margin-top: 10px;
-    }
-
-    .result {
-      padding: 9px;
-      margin-bottom: 6px;
-
-      border-radius: 12px;
-      background: rgba(255,255,255,0.05);
-
-      font-size: 12px;
-    }
-
-    .result small {
-      display: block;
-      color: #8992a2;
-      margin-top: 4px;
-    }
-
-    /* ================= STATUS ================= */
-
-    .status {
-      text-align: center;
-      color: #7f8999;
-      font-size: 10px;
-      margin-top: 8px;
-    }
-
-    /* ================= LEAFLET ================= */
-
-    .leaflet-control-layers {
-      background: rgba(7,10,16,0.92) !important;
-      color: white !important;
-      border: 1px solid rgba(255,255,255,0.10) !important;
-      border-radius: 12px !important;
-    }
-
-    .leaflet-control-layers label {
-      color: white;
-    }
-
-    .leaflet-control-zoom {
-      display: none;
-    }
-
-    @media (max-width: 430px) {
-      .logo {
-        min-width: 80px;
-      }
-
-      .logo-main {
-        font-size: 17px;
-      }
-
-      .tool {
-        font-size: 10px;
-      }
-    }
-  </style>
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  padding:10px;
+
+  background:rgba(5,8,13,.91);
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:20px;
+
+  backdrop-filter:blur(18px);
+  box-shadow:0 12px 40px rgba(0,0,0,.4);
+}
+
+.logo{
+  min-width:82px;
+  text-align:center;
+}
+
+.logoMain{
+  font-size:19px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+
+.logoSub{
+  color:#7e899a;
+  font-size:7px;
+  letter-spacing:1px;
+  margin-top:3px;
+}
+
+.search{
+  flex:1;
+  display:flex;
+  gap:6px;
+}
+
+#searchInput{
+  width:100%;
+  min-width:0;
+
+  padding:12px;
+
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:13px;
+
+  outline:none;
+
+  background:rgba(255,255,255,.07);
+  color:white;
+
+  font-size:13px;
+}
+
+#searchInput::placeholder{
+  color:#7f8999;
+}
+
+.searchBtn{
+  width:44px;
+  border:0;
+  border-radius:13px;
+  background:white;
+  color:#05070b;
+  font-size:20px;
+}
+
+/* ================= MODE SWITCH ================= */
+
+.modeSwitch{
+  position:fixed;
+  top:84px;
+  left:12px;
+  right:12px;
+
+  z-index:1000;
+
+  display:flex;
+  gap:7px;
+
+  padding:6px;
+
+  background:rgba(5,8,13,.88);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+
+  backdrop-filter:blur(16px);
+}
+
+.modeBtn{
+  flex:1;
+
+  padding:10px 6px;
+
+  border:0;
+  border-radius:11px;
+
+  background:transparent;
+  color:#8993a4;
+
+  font-size:11px;
+  font-weight:bold;
+}
+
+.modeBtn.active{
+  background:rgba(255,255,255,.13);
+  color:white;
+}
+
+/* ================= MAP TYPE ================= */
+
+.mapTypes{
+  position:fixed;
+  top:132px;
+  right:12px;
+
+  z-index:999;
+
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.mapType{
+  padding:9px 11px;
+
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;
+
+  background:rgba(5,8,13,.9);
+  color:white;
+
+  font-size:10px;
+
+  backdrop-filter:blur(12px);
+}
+
+.mapType.active{
+  background:white;
+  color:#05070b;
+}
+
+/* ================= INTELLIGENCE ================= */
+
+.intelPanel{
+  position:fixed;
+
+  top:174px;
+  left:12px;
+  right:12px;
+
+  z-index:900;
+
+  display:none;
+
+  max-height:calc(100vh - 250px);
+  overflow:auto;
+
+  background:rgba(5,8,13,.91);
+  border:1px solid rgba(255,255,255,.11);
+  border-radius:20px;
+
+  padding:13px;
+
+  backdrop-filter:blur(20px);
+  box-shadow:0 15px 50px rgba(0,0,0,.45);
+}
+
+.intelHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin-bottom:12px;
+}
+
+.intelTitle{
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:1px;
+}
+
+.intelLive{
+  font-size:9px;
+  color:#8f9aaa;
+}
+
+.close{
+  border:0;
+  background:transparent;
+  color:#8791a1;
+  font-size:17px;
+}
+
+/* ================= STATS ================= */
+
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.stat{
+  padding:12px;
+
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:15px;
+
+  background:rgba(255,255,255,.045);
+}
+
+.statIcon{
+  font-size:19px;
+}
+
+.statName{
+  color:#8993a4;
+  font-size:9px;
+  margin-top:5px;
+}
+
+.statValue{
+  font-size:16px;
+  font-weight:bold;
+  margin-top:3px;
+}
+
+/* ================= ACTIONS ================= */
+
+.intelActions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-top:10px;
+}
+
+.action{
+  padding:12px 7px;
+
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:13px;
+
+  background:rgba(255,255,255,.05);
+  color:white;
+
+  font-size:10px;
+}
+
+/* ================= RESULTS ================= */
+
+.results{
+  margin-top:10px;
+}
+
+.result{
+  padding:10px;
+
+  margin-bottom:6px;
+
+  background:rgba(255,255,255,.045);
+  border-radius:12px;
+
+  font-size:11px;
+}
+
+.result small{
+  display:block;
+  color:#7f8999;
+  margin-top:4px;
+  line-height:1.5;
+}
+
+/* ================= BOTTOM ================= */
+
+.bottom{
+  position:fixed;
+
+  left:10px;
+  right:10px;
+  bottom:10px;
+
+  z-index:1000;
+
+  background:rgba(5,8,13,.94);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:21px;
+
+  padding:11px;
+
+  backdrop-filter:blur(18px);
+}
+
+.handle{
+  width:38px;
+  height:4px;
+  border-radius:10px;
+  background:#555f70;
+  margin:0 auto 10px;
+}
+
+.bottomGrid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+}
+
+.tool{
+  padding:10px 3px;
+
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:13px;
+
+  background:rgba(255,255,255,.045);
+  color:white;
+
+  font-size:9px;
+}
+
+.tool span{
+  display:block;
+  font-size:20px;
+  margin-bottom:4px;
+}
+
+/* ================= LOCATION ================= */
+
+.locationBtn{
+  position:fixed;
+
+  right:18px;
+  bottom:205px;
+
+  z-index:999;
+
+  width:49px;
+  height:49px;
+
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:15px;
+
+  background:rgba(5,8,13,.92);
+  color:white;
+
+  font-size:21px;
+}
+
+/* ================= STATUS ================= */
+
+.status{
+  margin-top:9px;
+  text-align:center;
+
+  color:#7e899a;
+  font-size:9px;
+}
+
+/* ================= LEAFLET ================= */
+
+.leaflet-control-zoom{
+  display:none;
+}
+
+.leaflet-control-attribution{
+  font-size:7px;
+}
+
+</style>
 </head>
 
 <body>
 
-  <!-- MAP -->
-  <div id="map"></div>
+<div id="map"></div>
 
-  <!-- HEADER -->
-  <div class="topbar">
+<!-- TOP -->
 
-    <div class="logo">
-      <div class="logo-main">TERRA X</div>
-      <div class="logo-sub">SEE THE WORLD DIFFERENTLY</div>
-    </div>
+<div class="topbar">
 
-    <div class="searchBox">
+  <div class="logo">
+    <div class="logoMain">TERRA X</div>
+    <div class="logoSub">SEE THE WORLD DIFFERENTLY</div>
+  </div>
 
-      <input
-        id="searchInput"
-        type="text"
-        placeholder="ابحث عن مدينة، مكان، مستشفى..."
-      >
+  <div class="search">
 
-      <button class="searchBtn" onclick="smartSearch()">⌕</button>
+    <input
+      id="searchInput"
+      placeholder="ابحث عن مدينة أو مكان..."
+    >
 
-    </div>
+    <button class="searchBtn" onclick="searchPlace()">
+      🔎
+    </button>
 
   </div>
 
-  <!-- INFO CARD -->
-  <div class="infoCard" id="infoCard">
+</div>
 
-    <button class="closeBtn" onclick="closeInfo()">✕</button>
 
-    <div class="infoTitle" id="infoTitle">
-      TERRA X
-    </div>
+<!-- MODE -->
 
-    <div class="infoText" id="infoText">
-      جاهز لتحليل العالم.
-    </div>
+<div class="modeSwitch">
 
-    <div id="results"></div>
-
-    <div class="status" id="status"></div>
-
-  </div>
-
-  <!-- LOCATION -->
   <button
-    class="locationBtn"
-    onclick="getMyLocation()"
-    title="موقعي"
+    id="mapModeBtn"
+    class="modeBtn active"
+    onclick="setMode('map')"
   >
-    📍
+    🗺️ الخريطة
   </button>
 
-  <!-- BOTTOM PANEL -->
-  <div class="bottomPanel">
+  <button
+    id="intelModeBtn"
+    class="modeBtn"
+    onclick="setMode('intel')"
+  >
+    🛰️ INTELLIGENCE
+  </button>
 
-    <div class="handle"></div>
+</div>
 
-    <div class="tools">
 
-      <button class="tool" onclick="populationAI()">
-        <span>👥</span>
-        Population AI
-      </button>
+<!-- MAP TYPES -->
 
-      <button class="tool" onclick="satelliteCompare()">
-        <span>🛰️</span>
-        Satellite
-      </button>
+<div class="mapTypes">
 
-      <button class="tool" onclick="analysisMode()">
-        <span>📊</span>
-        Analysis
-      </button>
+  <button
+    class="mapType active"
+    id="streetBtn"
+    onclick="changeMap('street')"
+  >
+    🗺️ شوارع
+  </button>
 
-      <button class="tool" onclick="drawMode()">
-        <span>✏️</span>
-        تحديد منطقة
-      </button>
+  <button
+    class="mapType"
+    id="satelliteBtn"
+    onclick="changeMap('satellite')"
+  >
+    🛰️ قمر صناعي
+  </button>
 
+  <button
+    class="mapType"
+    id="terrainBtn"
+    onclick="changeMap('terrain')"
+  >
+    ⛰️ تضاريس
+  </button>
+
+</div>
+
+
+<!-- INTELLIGENCE PANEL -->
+
+<div class="intelPanel" id="intelPanel">
+
+  <div class="intelHeader">
+
+    <div>
+      <div class="intelTitle">
+        🛰️ TERRA X INTELLIGENCE
+      </div>
+
+      <div class="intelLive">
+        GEOSPATIAL ANALYSIS
+      </div>
+    </div>
+
+    <button
+      class="close"
+      onclick="setMode('map')"
+    >
+      ✕
+    </button>
+
+  </div>
+
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="statIcon">👥</div>
+      <div class="statName">POPULATION</div>
+      <div class="statValue" id="populationValue">—</div>
+    </div>
+
+    <div class="stat">
+      <div class="statIcon">🏠</div>
+      <div class="statName">BUILDINGS</div>
+      <div class="statValue" id="buildingValue">—</div>
+    </div>
+
+    <div class="stat">
+      <div class="statIcon">📐</div>
+      <div class="statName">AREA</div>
+      <div class="statValue" id="areaValue">—</div>
+    </div>
+
+    <div class="stat">
+      <div class="statIcon">📊</div>
+      <div class="statName">DENSITY</div>
+      <div class="statValue" id="densityValue">—</div>
     </div>
 
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <script>
+  <div class="intelActions">
 
-    /* =====================================================
-       MAP LAYERS
-    ===================================================== */
+    <button class="action" onclick="populationAI()">
+      👥 Population AI
+    </button>
 
-    const street = L.tileLayer(
-      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-      {
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap contributors"
-      }
-    );
+    <button class="action" onclick="satelliteCompare()">
+      🔄 Satellite Compare
+    </button>
 
-    const satellite = L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-      {
-        maxZoom: 19,
-        attribution: "Tiles &copy; Esri"
-      }
-    );
+    <button class="action" onclick="buildingAnalysis()">
+      🏠 Buildings
+    </button>
 
-    const terrain = L.tileLayer(
-      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
-      {
-        maxZoom: 13,
-        attribution: "Tiles &copy; Esri"
-      }
-    );
+    <button class="action" onclick="vegetationAnalysis()">
+      🌳 Vegetation
+    </button>
 
-    const map = L.map("map", {
-      center: [31.95, 35.91],
-      zoom: 7,
-      layers: [street]
-    });
+  </div>
 
-    const mapTypes = {
-      "🗺️ الشوارع": street,
-      "🛰️ القمر الصناعي": satellite,
-      "⛰️ التضاريس": terrain
-    };
 
-    L.control.layers(mapTypes, null, {
-      position: "topright"
-    }).addTo(map);
+  <div class="results" id="results"></div>
 
+  <div class="status" id="status">
+    TERRA X READY
+  </div>
 
-    /* =====================================================
-       VARIABLES
-    ===================================================== */
+</div>
 
-    let markers = [];
-    let userLocation = null;
-    let userMarker = null;
-    let accuracyCircle = null;
-    let selectedArea = null;
 
+<!-- LOCATION -->
 
-    /* =====================================================
-       UI
-    ===================================================== */
+<button
+  class="locationBtn"
+  onclick="getMyLocation()"
+>
+  📍
+</button>
 
-    function showInfo(title, text) {
 
-      document.getElementById("infoCard").style.display = "block";
+<!-- BOTTOM -->
 
-      document.getElementById("infoTitle").innerText = title;
+<div class="bottom">
 
-      document.getElementById("infoText").innerText = text;
+  <div class="handle"></div>
 
-    }
+  <div class="bottomGrid">
 
+    <button class="tool" onclick="setMode('intel')">
+      <span>🛰️</span>
+      Intelligence
+    </button>
 
-    function closeInfo() {
+    <button class="tool" onclick="drawArea()">
+      <span>✏️</span>
+      تحديد منطقة
+    </button>
 
-      document.getElementById("infoCard").style.display = "none";
+    <button class="tool" onclick="populationAI()">
+      <span>👥</span>
+      السكان
+    </button>
 
-    }
+    <button class="tool" onclick="satelliteCompare()">
+      <span>🔄</span>
+      مقارنة
+    </button>
 
+  </div>
 
-    function clearMarkers() {
+</div>
 
-      markers.forEach(marker => map.removeLayer(marker));
 
-      markers = [];
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    }
+<script>
 
+/* =====================================================
+   MAP
+===================================================== */
 
-    /* =====================================================
-       SEARCH
-    ===================================================== */
+const street = L.tileLayer(
+  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom:19,
+    attribution:"© OpenStreetMap contributors"
+  }
+);
 
-    async function smartSearch() {
+const satellite = L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  {
+    maxZoom:19,
+    attribution:"Tiles © Esri"
+  }
+);
 
-      const input =
-        document.getElementById("searchInput").value.trim();
+const terrain = L.tileLayer(
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+  {
+    maxZoom:13,
+    attribution:"Tiles © Esri"
+  }
+);
 
-      if (!input) return;
+const map = L.map("map",{
+  center:[31.95,35.91],
+  zoom:7,
+  layers:[street]
+});
 
-      showInfo(
-        "🔎 TERRA X SEARCH",
-        "جاري تحليل طلبك..."
-      );
 
-      document.getElementById("results").innerHTML = "";
+/* =====================================================
+   VARIABLES
+===================================================== */
 
-      clearMarkers();
+let currentLayer = street;
 
-      try {
+let markers = [];
 
-        const geoURL =
-          "https://nominatim.openstreetmap.org/search" +
-          "?format=jsonv2&limit=1&q=" +
-          encodeURIComponent(input);
+let userLocation = null;
 
-        const response =
-          await fetch(geoURL);
+let userMarker = null;
 
-        const data =
-          await response.json();
+let accuracyCircle = null;
 
-        if (!data.length) {
+let drawing = false;
 
-          showInfo(
-            "❌ لم نجد النتيجة",
-            "جرّب اسمًا آخر أو اكتب المدينة مع المكان."
-          );
+let drawingPoints = [];
 
-          return;
+let drawingMarkers = [];
 
-        }
+let areaPolygon = null;
 
-        const place = data[0];
 
-        const lat =
-          parseFloat(place.lat);
+/* =====================================================
+   MAP SWITCH
+===================================================== */
 
-        const lon =
-          parseFloat(place.lon);
+function changeMap(type){
 
-        map.setView(
-          [lat, lon],
-          13
-        );
+  if(currentLayer){
 
-        const marker =
-          L.marker([lat, lon])
-          .addTo(map);
+    map.removeLayer(currentLayer);
 
-        marker.bindPopup(
-          `<b>${place.display_name}</b>`
-        ).openPopup();
+  }
 
-        markers.push(marker);
+  if(type === "street"){
 
-        showInfo(
-          "📍 الموقع",
-          place.display_name
-        );
+    currentLayer = street;
 
-      } catch (error) {
+    street.addTo(map);
 
-        showInfo(
-          "⚠️ خطأ",
-          "تعذر الاتصال بخدمة البحث."
-        );
+  }
 
-      }
+  if(type === "satellite"){
 
-    }
+    currentLayer = satellite;
 
+    satellite.addTo(map);
 
-    /* =====================================================
-       MY LOCATION
-    ===================================================== */
+  }
 
-    function getMyLocation() {
+  if(type === "terrain"){
 
-      if (!navigator.geolocation) {
+    currentLayer = terrain;
 
-        showInfo(
-          "❌ غير متاح",
-          "جهازك لا يدعم تحديد الموقع."
-        );
+    terrain.addTo(map);
 
-        return;
+  }
 
-      }
 
-      showInfo(
-        "📍 موقعي الآن",
-        "جاري تحديد موقعك..."
-      );
+  document
+    .querySelectorAll(".mapType")
+    .forEach(btn => btn.classList.remove("active"));
 
-      navigator.geolocation.getCurrentPosition(
 
-        position => {
+  if(type === "street")
+    document.getElementById("streetBtn").classList.add("active");
 
-          const lat =
-            position.coords.latitude;
+  if(type === "satellite")
+    document.getElementById("satelliteBtn").classList.add("active");
 
-          const lon =
-            position.coords.longitude;
+  if(type === "terrain")
+    document.getElementById("terrainBtn").classList.add("active");
 
-          const accuracy =
-            position.coords.accuracy;
+}
 
-          userLocation =
-            [lat, lon];
 
-          if (userMarker)
-            map.removeLayer(userMarker);
+/* =====================================================
+   MODES
+===================================================== */
 
-          if (accuracyCircle)
-            map.removeLayer(accuracyCircle);
+function setMode(mode){
 
-          userMarker =
-            L.marker(userLocation)
-            .addTo(map)
-            .bindPopup("📍 موقعك الحالي")
-            .openPopup();
+  const mapBtn =
+    document.getElementById("mapModeBtn");
 
-          accuracyCircle =
-            L.circle(
-              userLocation,
-              {
-                radius: accuracy
-              }
-            ).addTo(map);
+  const intelBtn =
+    document.getElementById("intelModeBtn");
 
-          map.setView(
-            userLocation,
-            15
-          );
+  const panel =
+    document.getElementById("intelPanel");
 
-          showInfo(
-            "📍 موقعك",
-            "تم تحديد موقعك بنجاح."
-          );
 
-        },
+  if(mode === "map"){
 
-        error => {
+    mapBtn.classList.add("active");
 
-          showInfo(
-            "⚠️ تعذر تحديد الموقع",
-            "تأكد من السماح للتطبيق باستخدام الموقع."
-          );
+    intelBtn.classList.remove("active");
 
-        },
+    panel.style.display = "none";
 
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
+  }
 
-      );
 
-    }
+  if(mode === "intel"){
 
+    mapBtn.classList.remove("active");
 
-    /* =====================================================
-       POPULATION AI
-    ===================================================== */
+    intelBtn.classList.add("active");
 
-    function populationAI() {
+    panel.style.display = "block";
 
-      showInfo(
-        "👥 POPULATION AI",
-        "حدد منطقة على الخريطة لتحليل السكان."
-      );
+  }
 
-      document.getElementById("results").innerHTML = `
+}
 
-        <div class="result">
-          👥 تقدير السكان
-          <small>
-            سيتم حسابه من بيانات سكانية حقيقية
-            عند ربط مصدر البيانات.
-          </small>
-        </div>
 
-        <div class="result">
-          🏠 المباني
-          <small>
-            تحليل الكثافة العمرانية
-          </small>
-        </div>
+/* =====================================================
+   SEARCH
+===================================================== */
 
-        <div class="result">
-          📊 الكثافة
-          <small>
-            عدد السكان بالنسبة للمساحة
-          </small>
-        </div>
+async function searchPlace(){
 
-      `;
-
-    }
-
-
-    /* =====================================================
-       SATELLITE COMPARE
-    ===================================================== */
-
-    function satelliteCompare() {
-
-      showInfo(
-        "🛰️ SATELLITE COMPARE",
-        "ميزة مقارنة صور الأقمار الصناعية قيد البناء."
-      );
-
-      document.getElementById("results").innerHTML = `
-
-        <div class="result">
-          🔄 مقارنة زمنية
-          <small>
-            قبل ← بعد
-          </small>
-        </div>
-
-        <div class="result">
-          📅 السنوات
-          <small>
-            سيتم عرض السنوات المتاحة للموقع.
-          </small>
-        </div>
-
-        <div class="result">
-          🔍 تحليل التغير
-          <small>
-            عمران • نباتات • تغيرات سطحية
-          </small>
-        </div>
-
-      `;
-
-    }
-
-
-    /* =====================================================
-       ANALYSIS
-    ===================================================== */
-
-    function analysisMode() {
-
-      showInfo(
-        "📊 TERRA X ANALYSIS",
-        "اختر منطقة لبدء التحليل الجغرافي."
-      );
-
-      document.getElementById("results").innerHTML = `
-
-        <div class="result">
-          🏙️ العمران
-          <small>
-            تحليل المناطق المبنية
-          </small>
-        </div>
-
-        <div class="result">
-          🌳 الغطاء النباتي
-          <small>
-            تحليل المساحات الخضراء
-          </small>
-        </div>
-
-        <div class="result">
-          🛣️ الطرق
-          <small>
-            تحليل شبكة الطرق
-          </small>
-        </div>
-
-        <div class="result">
-          🏠 المباني
-          <small>
-            تحليل المباني والمناطق السكنية
-          </small>
-        </div>
-
-      `;
-
-    }
-
-
-    /* =====================================================
-       AREA SELECTION
-    ===================================================== */
-
-    function drawMode() {
-
-      showInfo(
-        "✏️ تحديد منطقة",
-        "اضغط على نقطتين أو أكثر على الخريطة لإنشاء منطقة."
-      );
-
-      alert(
-        "ميزة الرسم المتقدم سنضيفها في الخطوة التالية 🔥"
-      );
-
-    }
-
-
-    /* =====================================================
-       ENTER KEY
-    ===================================================== */
-
+  const query =
     document
       .getElementById("searchInput")
-      .addEventListener(
-        "keydown",
-        function(event) {
+      .value
+      .trim();
 
-          if (event.key === "Enter") {
 
-            smartSearch();
+  if(!query) return;
 
+
+  setMode("map");
+
+
+  try{
+
+    const url =
+      "https://nominatim.openstreetmap.org/search" +
+      "?format=jsonv2&limit=1&q=" +
+      encodeURIComponent(query);
+
+
+    const response =
+      await fetch(url);
+
+
+    const data =
+      await response.json();
+
+
+    if(!data.length){
+
+      alert("لم نجد هذا المكان.");
+
+      return;
+
+    }
+
+
+    const place = data[0];
+
+    const lat =
+      parseFloat(place.lat);
+
+    const lon =
+      parseFloat(place.lon);
+
+
+    map.setView(
+      [lat,lon],
+      14
+    );
+
+
+    clearMarkers();
+
+
+    const marker =
+      L.marker([lat,lon])
+      .addTo(map);
+
+
+    marker
+      .bindPopup(
+        "<b>📍 "+place.display_name+"</b>"
+      )
+      .openPopup();
+
+
+    markers.push(marker);
+
+
+  }catch(error){
+
+    alert("حدث خطأ أثناء البحث.");
+
+  }
+
+}
+
+
+/* =====================================================
+   CLEAR MARKERS
+===================================================== */
+
+function clearMarkers(){
+
+  markers.forEach(
+    marker => map.removeLayer(marker)
+  );
+
+  markers=[];
+
+}
+
+
+/* =====================================================
+   LOCATION
+===================================================== */
+
+function getMyLocation(){
+
+  if(!navigator.geolocation){
+
+    alert("تحديد الموقع غير مدعوم.");
+
+    return;
+
+  }
+
+
+  navigator.geolocation.getCurrentPosition(
+
+    position => {
+
+      const lat =
+        position.coords.latitude;
+
+      const lon =
+        position.coords.longitude;
+
+      const accuracy =
+        position.coords.accuracy;
+
+
+      userLocation =
+        [lat,lon];
+
+
+      if(userMarker)
+        map.removeLayer(userMarker);
+
+
+      if(accuracyCircle)
+        map.removeLayer(accuracyCircle);
+
+
+      userMarker =
+        L.marker(userLocation)
+        .addTo(map)
+        .bindPopup("📍 موقعك الحالي");
+
+
+      accuracyCircle =
+        L.circle(
+          userLocation,
+          {
+            radius:accuracy
           }
+        )
+        .addTo(map);
 
-        }
+
+      map.setView(
+        userLocation,
+        15
       );
 
-  </script>
+
+    },
+
+    () => {
+
+      alert(
+        "لم نستطع تحديد موقعك. تأكد من إعطاء المتصفح إذن الموقع."
+      );
+
+    },
+
+    {
+      enableHighAccuracy:true,
+      timeout:10000,
+      maximumAge:0
+    }
+
+  );
+
+}
+
+
+/* =====================================================
+   DRAW AREA
+===================================================== */
+
+function drawArea(){
+
+  drawing = true;
+
+  drawingPoints = [];
+
+  drawingMarkers.forEach(
+    m => map.removeLayer(m)
+  );
+
+  drawingMarkers = [];
+
+
+  if(areaPolygon){
+
+    map.removeLayer(areaPolygon);
+
+    areaPolygon = null;
+
+  }
+
+
+  setMode("intel");
+
+
+  document.getElementById("status").innerText =
+    "✏️ اضغط على الخريطة لإضافة نقاط المنطقة";
+
+
+  map.once("click", addDrawingPoint);
+
+}
+
+
+/* =====================================================
+   DRAW POINT
+===================================================== */
+
+function addDrawingPoint(e){
+
+  if(!drawing) return;
+
+
+  drawingPoints.push(
+    [e.latlng.lat,e.latlng.lng]
+  );
+
+
+  const marker =
+    L.circleMarker(
+      e.latlng,
+      {
+        radius:6
+      }
+    ).addTo(map);
+
+
+  drawingMarkers.push(marker);
+
+
+  if(drawingPoints.length >= 3){
+
+    if(areaPolygon)
+      map.removeLayer(areaPolygon);
+
+
+    areaPolygon =
+      L.polygon(
+        drawingPoints,
+        {
+          fillOpacity:.18
+        }
+      ).addTo(map);
+
+
+    calculateArea();
+
+
+    drawing = false;
+
+
+    document.getElementById("status").innerText =
+      "✅ تم تحديد المنطقة";
+
+  }else{
+
+    map.once("click", addDrawingPoint);
+
+  }
+
+}
+
+
+/* =====================================================
+   AREA CALCULATION
+===================================================== */
+
+function calculateArea(){
+
+  if(!areaPolygon) return;
+
+
+  const latlngs =
+    areaPolygon.getLatLngs()[0];
+
+
+  let area = 0;
+
+
+  for(
+    let i=0;
+    i<latlngs.length;
+    i++
+  ){
+
+    const p1 =
+      latlngs[i];
+
+    const p2 =
+      latlngs[
+        (i+1)%latlngs.length
+      ];
+
+
+    area +=
+      (
+        p2.lng-p1.lng
+      ) *
+      (
+        p1.lat+p2.lat
+      );
+
+  }
+
+
+  area =
+    Math.abs(area) *
+    12364 /
+    2;
+
+
+  document
+    .getElementById("areaValue")
+    .innerText =
+      area.toFixed(2)+" km²";
+
+
+  document
+    .getElementById("status")
+    .innerText =
+      "📐 مساحة المنطقة: "+
+      area.toFixed(2)+
+      " km²";
+
+}
+
+
+/* =====================================================
+   POPULATION AI
+===================================================== */
+
+function populationAI(){
+
+  setMode("intel");
+
+
+  document
+    .getElementById("populationValue")
+    .innerText = "—";
+
+
+  document
+    .getElementById("densityValue")
+    .innerText = "—";
+
+
+  document
+    .getElementById("results")
+    .innerHTML = `
+
+      <div class="result">
+        👥 POPULATION AI
+        <small>
+          سيعتمد النظام على مساحة المنطقة
+          وبيانات السكان والكثافة المتاحة
+          لإنتاج تقدير، وليس عدًّا مباشرًا للأشخاص.
+        </small>
+      </div>
+
+      <div class="result">
+        🛰️ Satellite Context
+        <small>
+          صور الأقمار الصناعية تساعد على فهم
+          طبيعة المنطقة والعمران.
+        </small>
+      </div>
+
+    `;
+
+
+  document
+    .getElementById("status")
+    .innerText =
+      "👥 بانتظار تحديد منطقة للتحليل";
+
+}
+
+
+/* =====================================================
+   BUILDINGS
+===================================================== */
+
+function buildingAnalysis(){
+
+  setMode("intel");
+
+
+  document
+    .getElementById("results")
+    .innerHTML = `
+
+      <div class="result">
+        🏠 BUILDING ANALYSIS
+        <small>
+          المرحلة التالية ستربط TERRA X
+          ببيانات المباني الحقيقية وتحلل
+          الكثافة العمرانية.
+        </small>
+      </div>
+
+    `;
+
+
+  document
+    .getElementById("buildingValue")
+    .innerText = "—";
+
+}
+
+
+/* =====================================================
+   VEGETATION
+===================================================== */
+
+function vegetationAnalysis(){
+
+  setMode("intel");
+
+
+  document
+    .getElementById("results")
+    .innerHTML = `
+
+      <div class="result">
+        🌳 VEGETATION ANALYSIS
+        <small>
+          سيتم لاحقًا حساب نسبة الغطاء النباتي
+          من بيانات الاستشعار عن بعد المتاحة.
+        </small>
+      </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   SATELLITE COMPARE
+===================================================== */
+
+function satelliteCompare(){
+
+  setMode("intel");
+
+
+  document
+    .getElementById("results")
+    .innerHTML = `
+
+      <div class="result">
+        🔄 SATELLITE COMPARE
+        <small>
+          اختر منطقة ثم نقارن صور الأقمار
+          الصناعية المتاحة عبر فترات زمنية مختلفة.
+        </small>
+      </div>
+
+      <div class="result">
+        📅 BEFORE
+        <small>
+          الصورة التاريخية المتاحة
+        </small>
+      </div>
+
+      <div class="result">
+        📅 AFTER
+        <small>
+          أحدث صورة متاحة
+        </small>
+      </div>
+
+    `;
+
+
+  changeMap("satellite");
+
+
+  document
+    .getElementById("status")
+    .innerText =
+      "🛰️ Satellite Compare جاهز للربط بمصدر الصور التاريخية";
+
+}
+
+
+/* =====================================================
+   ENTER SEARCH
+===================================================== */
+
+document
+  .getElementById("searchInput")
+  .addEventListener(
+    "keydown",
+    function(e){
+
+      if(e.key === "Enter")
+        searchPlace();
+
+    }
+  );
+
+</script>
 
 </body>
-</html>
+                                                                </html>
