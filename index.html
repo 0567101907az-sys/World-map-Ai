@@ -3,101 +3,153 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>WORLD MAP AI</title>
 
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      background: #07111f;
-      color: white;
       font-family: Arial, sans-serif;
+      background: #0b1220;
+      color: white;
     }
 
     header {
-      text-align: center;
+      background: #111c31;
       padding: 18px;
-      background: #0b1728;
-      border-bottom: 1px solid #20324a;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      border-bottom: 1px solid #263653;
     }
 
-    h1 { margin: 0; font-size: 25px; }
-
-    header p {
-      margin: 6px 0 0;
-      color: #9fb2c8;
+    .subtitle {
+      font-size: 13px;
+      color: #9fb0c9;
+      margin-top: 5px;
     }
 
-    .search {
-      display: flex;
-      gap: 8px;
-      padding: 14px;
-      background: #0b1728;
+    .search-box {
+      padding: 15px;
+      background: #0f192b;
     }
 
-    input {
-      flex: 1;
+    #searchInput {
+      width: 100%;
       padding: 14px;
       border-radius: 12px;
-      border: 1px solid #30445d;
-      background: #111f31;
+      border: 1px solid #334563;
+      background: #17243a;
       color: white;
       font-size: 16px;
       outline: none;
     }
 
-    button {
-      padding: 0 18px;
-      border: 0;
+    #searchInput::placeholder {
+      color: #8b9ab2;
+    }
+
+    #searchBtn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 13px;
+      border: none;
       border-radius: 12px;
-      background: #238636;
+      background: #2563eb;
       color: white;
-      font-weight: bold;
       font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #searchBtn:active {
+      transform: scale(0.98);
+    }
+
+    .examples {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-top: 10px;
+    }
+
+    .example {
+      white-space: nowrap;
+      background: #1a2942;
+      border: 1px solid #334563;
+      color: #dbe7f8;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 13px;
     }
 
     #status {
-      padding: 10px 14px;
-      color: #9fb2c8;
-      background: #07111f;
+      padding: 10px 15px;
+      color: #9fb0c9;
+      font-size: 14px;
+      min-height: 35px;
     }
 
     #map {
       width: 100%;
-      height: 62vh;
+      height: 58vh;
       min-height: 400px;
     }
 
     #results {
-      padding: 12px;
-      background: #0b1728;
+      padding: 15px;
+      background: #0b1220;
     }
 
     .result {
-      padding: 12px;
-      margin-bottom: 8px;
-      border: 1px solid #263a53;
+      background: #131f34;
+      border: 1px solid #263653;
       border-radius: 12px;
-      background: #111f31;
+      padding: 13px;
+      margin-bottom: 10px;
+      cursor: pointer;
     }
 
-    .result strong {
-      display: block;
+    .result:hover {
+      background: #192943;
+    }
+
+    .result-title {
+      font-size: 16px;
+      font-weight: bold;
       margin-bottom: 5px;
     }
 
-    .result small {
-      color: #9fb2c8;
+    .result-address {
+      color: #9fb0c9;
+      font-size: 13px;
+      line-height: 1.5;
     }
 
-    .empty {
+    .leaflet-control-layers {
+      border-radius: 10px !important;
+      overflow: hidden;
+    }
+
+    .leaflet-control-layers-toggle {
+      width: 40px !important;
+      height: 40px !important;
+    }
+
+    footer {
       text-align: center;
-      color: #7f93aa;
-      padding: 10px;
+      padding: 15px;
+      color: #65758f;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -105,568 +157,818 @@
 <body>
 
 <header>
-  <h1>🌍 WORLD MAP AI</h1>
-  <p>مساعدك الجغرافي الذكي</p>
+  🌍 WORLD MAP AI
+  <div class="subtitle">خريطة ذكية للعالم</div>
 </header>
 
-<div class="search">
+<div class="search-box">
+
   <input
     id="searchInput"
-    placeholder="🔎 مثال: مستشفيات نابلس"
-    autocomplete="off"
+    type="text"
+    placeholder="مثال: مستشفيات نابلس أو جامعات لندن"
   >
-  <button onclick="smartSearch()">بحث</button>
+
+  <button id="searchBtn" onclick="smartSearch()">
+    🔎 بحث
+  </button>
+
+  <div class="examples">
+    <div class="example" onclick="setSearch('مستشفيات نابلس')">
+      🏥 مستشفيات نابلس
+    </div>
+
+    <div class="example" onclick="setSearch('جامعات لندن')">
+      🎓 جامعات لندن
+    </div>
+
+    <div class="example" onclick="setSearch('مساجد القدس')">
+      🕌 مساجد القدس
+    </div>
+
+    <div class="example" onclick="setSearch('مدارس حول نابلس')">
+      🏫 مدارس نابلس
+    </div>
+
+    <div class="example" onclick="setSearch('stadiums in Barcelona')">
+      🏟️ ملاعب برشلونة
+    </div>
+  </div>
+
 </div>
 
 <div id="status">
-  جرّب: مستشفيات نابلس أو جامعات لندن
+  جاهز للبحث 🌍
 </div>
 
 <div id="map"></div>
 
-<div id="results">
-  <div class="empty">نتائج البحث ستظهر هنا</div>
-</div>
+<div id="results"></div>
+
+<footer>
+  WORLD MAP AI — OpenStreetMap & Esri
+</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-const map = L.map("map").setView([31.95, 35.91], 7);
+  // =========================
+  // الخريطة
+  // =========================
 
-L.tileLayer(
-  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors"
-  }
-).addTo(map);
+  const street = L.tileLayer(
+    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom: 19,
+      attribution: "&copy; OpenStreetMap contributors"
+    }
+  );
 
-let markers = [];
+  const satellite = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom: 19,
+      attribution: "Tiles &copy; Esri"
+    }
+  );
 
-const categories = {
+  const terrain = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom: 13,
+      attribution: "Tiles &copy; Esri"
+    }
+  );
 
-  "مستشفى": {
-    ar: "مستشفى",
-    tags: [
-      '["amenity"="hospital"]'
-    ]
-  },
-
-  "مستشفيات": {
-    ar: "مستشفى",
-    tags: [
-      '["amenity"="hospital"]'
-    ]
-  },
-
-  "hospital": {
-    ar: "مستشفى",
-    tags: [
-      '["amenity"="hospital"]'
-    ]
-  },
-
-  "hospitals": {
-    ar: "مستشفى",
-    tags: [
-      '["amenity"="hospital"]'
-    ]
-  },
-
-  "جامعة": {
-    ar: "جامعة",
-    tags: [
-      '["amenity"="university"]'
-    ]
-  },
-
-  "جامعات": {
-    ar: "جامعة",
-    tags: [
-      '["amenity"="university"]'
-    ]
-  },
-
-  "university": {
-    ar: "جامعة",
-    tags: [
-      '["amenity"="university"]'
-    ]
-  },
-
-  "universities": {
-    ar: "جامعة",
-    tags: [
-      '["amenity"="university"]'
-    ]
-  },
-
-  "مدرسة": {
-    ar: "مدرسة",
-    tags: [
-      '["amenity"="school"]'
-    ]
-  },
-
-  "مدارس": {
-    ar: "مدرسة",
-    tags: [
-      '["amenity"="school"]'
-    ]
-  },
-
-  "school": {
-    ar: "مدرسة",
-    tags: [
-      '["amenity"="school"]'
-    ]
-  },
-
-  "schools": {
-    ar: "مدرسة",
-    tags: [
-      '["amenity"="school"]'
-    ]
-  },
-
-  "مسجد": {
-    ar: "مسجد",
-    tags: [
-      '["amenity"="place_of_worship"]["religion"="muslim"]',
-      '["amenity"="place_of_worship"]'
-    ]
-  },
-
-  "مساجد": {
-    ar: "مسجد",
-    tags: [
-      '["amenity"="place_of_worship"]["religion"="muslim"]',
-      '["amenity"="place_of_worship"]'
-    ]
-  },
-
-  "mosque": {
-    ar: "مسجد",
-    tags: [
-      '["amenity"="place_of_worship"]["religion"="muslim"]',
-      '["amenity"="place_of_worship"]'
-    ]
-  },
-
-  "mosques": {
-    ar: "مسجد",
-    tags: [
-      '["amenity"="place_of_worship"]["religion"="muslim"]',
-      '["amenity"="place_of_worship"]'
-    ]
-  },
-
-  "ملعب": {
-    ar: "ملعب",
-    tags: [
-      '["leisure"="stadium"]'
-    ]
-  },
-
-  "ملاعب": {
-    ar: "ملعب",
-    tags: [
-      '["leisure"="stadium"]'
-    ]
-  },
-
-  "stadium": {
-    ar: "ملعب",
-    tags: [
-      '["leisure"="stadium"]'
-    ]
-  },
-
-  "stadiums": {
-    ar: "ملعب",
-    tags: [
-      '["leisure"="stadium"]'
-    ]
-  }
-
-};
-
-
-function clearMarkers() {
-
-  markers.forEach(marker => {
-    map.removeLayer(marker);
+  const map = L.map("map", {
+    center: [31.95, 35.91],
+    zoom: 7,
+    layers: [street]
   });
 
-  markers = [];
-}
+  // قائمة تغيير نوع الخريطة
+  const mapTypes = {
+    "🗺️ الشوارع": street,
+    "🛰️ قمر صناعي": satellite,
+    "⛰️ تضاريس": terrain
+  };
+
+  L.control.layers(
+    mapTypes,
+    null,
+    {
+      position: "topright"
+    }
+  ).addTo(map);
 
 
-function escapeHTML(text) {
+  // =========================
+  // المتغيرات
+  // =========================
 
-  return String(text || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+  let markers = [];
 
 
-function findCategory(text) {
+  // =========================
+  // أنواع الأماكن
+  // =========================
 
-  const words = text.toLowerCase().split(/\s+/);
+  const categories = {
 
-  for (const word of words) {
+    hospital: [
+      "مستشفى",
+      "مستشفيات",
+      "hospital",
+      "hospitals"
+    ],
 
-    if (categories[word]) {
-      return {
-        key: word,
-        data: categories[word]
-      };
+    university: [
+      "جامعة",
+      "جامعات",
+      "university",
+      "universities"
+    ],
+
+    school: [
+      "مدرسة",
+      "مدارس",
+      "school",
+      "schools"
+    ],
+
+    mosque: [
+      "مسجد",
+      "مساجد",
+      "mosque",
+      "mosques"
+    ],
+
+    stadium: [
+      "ملعب",
+      "ملاعب",
+      "stadium",
+      "stadiums"
+    ],
+
+    police: [
+      "شرطة",
+      "مركز شرطة",
+      "police"
+    ],
+
+    pharmacy: [
+      "صيدلية",
+      "صيدليات",
+      "pharmacy",
+      "pharmacies"
+    ],
+
+    hotel: [
+      "فندق",
+      "فنادق",
+      "hotel",
+      "hotels"
+    ],
+
+    restaurant: [
+      "مطعم",
+      "مطاعم",
+      "restaurant",
+      "restaurants"
+    ],
+
+    airport: [
+      "مطار",
+      "مطارات",
+      "airport",
+      "airports"
+    ]
+  };
+
+
+  // =========================
+  // تنظيف العلامات
+  // =========================
+
+  function clearMarkers() {
+
+    markers.forEach(function(marker) {
+      map.removeLayer(marker);
+    });
+
+    markers = [];
+  }
+
+
+  // =========================
+  // حماية النص
+  // =========================
+
+  function escapeHTML(text) {
+
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+
+  // =========================
+  // معرفة نوع المكان
+  // =========================
+
+  function findCategory(text) {
+
+    const lower = text.toLowerCase();
+
+    for (const category in categories) {
+
+      for (const word of categories[category]) {
+
+        if (lower.includes(word.toLowerCase())) {
+          return category;
+        }
+
+      }
+
     }
 
+    return null;
   }
 
-  for (const key in categories) {
 
-    if (text.toLowerCase().includes(key)) {
-      return {
-        key: key,
-        data: categories[key]
-      };
+  // =========================
+  // تحويل النوع إلى OSM tags
+  // =========================
+
+  function getTags(category) {
+
+    if (category === "hospital") {
+      return [
+        '[amenity="hospital"]'
+      ];
     }
 
-  }
-
-  return null;
-}
-
-
-async function geocode(placeName) {
-
-  const url =
-    "https://nominatim.openstreetmap.org/search" +
-    "?format=jsonv2" +
-    "&limit=1" +
-    "&q=" +
-    encodeURIComponent(placeName);
-
-  const response = await fetch(url, {
-    headers: {
-      "Accept": "application/json"
+    if (category === "university") {
+      return [
+        '[amenity="university"]'
+      ];
     }
-  });
 
-  if (!response.ok) {
-    throw new Error("Geocoding failed");
+    if (category === "school") {
+      return [
+        '[amenity="school"]'
+      ];
+    }
+
+    if (category === "mosque") {
+      return [
+        '[amenity="place_of_worship"][religion="muslim"]',
+        '[amenity="place_of_worship"]'
+      ];
+    }
+
+    if (category === "stadium") {
+      return [
+        '[leisure="stadium"]'
+      ];
+    }
+
+    if (category === "police") {
+      return [
+        '[amenity="police"]'
+      ];
+    }
+
+    if (category === "pharmacy") {
+      return [
+        '[amenity="pharmacy"]'
+      ];
+    }
+
+    if (category === "hotel") {
+      return [
+        '[tourism="hotel"]'
+      ];
+    }
+
+    if (category === "restaurant") {
+      return [
+        '[amenity="restaurant"]'
+      ];
+    }
+
+    if (category === "airport") {
+      return [
+        '[aeroway="aerodrome"]'
+      ];
+    }
+
+    return [];
   }
 
-  const data = await response.json();
 
-  if (!data.length) {
-    throw new Error("Location not found");
+  // =========================
+  // البحث عن المدينة
+  // =========================
+
+  async function geocode(placeName) {
+
+    const url =
+      "https://nominatim.openstreetmap.org/search" +
+      "?format=jsonv2" +
+      "&limit=1" +
+      "&q=" +
+      encodeURIComponent(placeName);
+
+    const response = await fetch(url, {
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Geocoding failed");
+    }
+
+    const data = await response.json();
+
+    if (!data.length) {
+      return null;
+    }
+
+    return {
+      lat: parseFloat(data[0].lat),
+      lon: parseFloat(data[0].lon),
+      display: data[0].display_name
+    };
   }
 
-  return data[0];
-}
+
+  // =========================
+  // البحث عن الأماكن عبر Overpass
+  // =========================
+
+  async function searchPlaces(lat, lon, tags) {
+
+    const servers = [
+
+      "https://overpass-api.de/api/interpreter",
+
+      "https://overpass.kumi.systems/api/interpreter"
+
+    ];
+
+    for (const server of servers) {
+
+      try {
+
+        let queryParts = [];
+
+        tags.forEach(function(tag) {
+
+          queryParts.push(
+            `node(around:10000,${lat},${lon})${tag};`
+          );
+
+          queryParts.push(
+            `way(around:10000,${lat},${lon})${tag};`
+          );
+
+          queryParts.push(
+            `relation(around:10000,${lat},${lon})${tag};`
+          );
+
+        });
+
+        const query = `
+          [out:json][timeout:25];
+          (
+            ${queryParts.join("\n")}
+          );
+          out center tags;
+        `;
+
+        const response = await fetch(server, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: "data=" + encodeURIComponent(query)
+        });
+
+        if (!response.ok) {
+          continue;
+        }
+
+        const data = await response.json();
+
+        return data.elements || [];
+
+      } catch (error) {
+
+        console.log("Overpass server failed:", server);
+
+      }
+
+    }
+
+    throw new Error("All Overpass servers failed");
+  }
 
 
-async function searchPlaces(lat, lon, tags) {
+  // =========================
+  // البحث الذكي
+  // =========================
 
-  let queryParts = [];
+  async function smartSearch() {
 
-  tags.forEach(tag => {
+    const input =
+      document.getElementById("searchInput").value.trim();
 
-    queryParts.push(`
-      node${tag}(around:10000,${lat},${lon});
-      way${tag}(around:10000,${lat},${lon});
-      relation${tag}(around:10000,${lat},${lon});
-    `);
+    const status =
+      document.getElementById("status");
 
-  });
+    const results =
+      document.getElementById("results");
 
-  const query = `
-    [out:json][timeout:30];
-    (
-      ${queryParts.join("")}
-    );
-    out center tags;
-  `;
 
-  const servers = [
-    "https://overpass-api.de/api/interpreter",
-    "https://overpass.kumi.systems/api/interpreter"
-  ];
+    if (!input) {
 
-  for (const server of servers) {
+      status.innerText =
+        "اكتب شيئاً للبحث 🔎";
+
+      return;
+    }
+
+
+    clearMarkers();
+
+    results.innerHTML = "";
+
+    status.innerText =
+      "🔎 جاري فهم طلبك...";
+
 
     try {
 
-      const response = await fetch(server, {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=UTF-8"
-        },
-        body: query
-      });
-
-      if (!response.ok) continue;
-
-      const data = await response.json();
-
-      return data.elements || [];
-
-    } catch (error) {
-
-      console.log("Overpass server failed:", server);
-
-    }
-
-  }
-
-  throw new Error("All map servers failed");
-}
+      // معرفة نوع المكان
+      const category =
+        findCategory(input);
 
 
-async function smartSearch() {
+      // إذا لم نجد نوع مكان
+      if (!category) {
 
-  const input = document
-    .getElementById("searchInput")
-    .value
-    .trim();
+        const place =
+          await geocode(input);
 
-  const status = document.getElementById("status");
-  const results = document.getElementById("results");
+        if (!place) {
 
-  if (!input) {
+          status.innerText =
+            "❌ لم أجد هذا المكان.";
 
-    status.textContent = "اكتب طلب البحث أولًا 🔎";
-    return;
+          return;
+        }
 
-  }
 
-  status.textContent = "🤖 WORLD MAP AI يفهم طلبك...";
+        map.setView(
+          [place.lat, place.lon],
+          12
+        );
 
-  results.innerHTML = "";
 
-  clearMarkers();
+        const marker =
+          L.marker([
+            place.lat,
+            place.lon
+          ]).addTo(map);
 
-  try {
 
-    const category = findCategory(input);
+        marker.bindPopup(
+          "<b>" +
+          escapeHTML(place.display) +
+          "</b>"
+        );
 
-    let locationText = input;
 
-    if (category) {
+        markers.push(marker);
 
-      locationText = input
-        .replace(new RegExp(category.key, "ig"), "")
-        .replace("في", "")
-        .replace("حول", "")
-        .replace("near", "")
-        .replace("in", "")
-        .trim();
 
-    }
+        status.innerText =
+          "📍 تم العثور على المكان";
 
-    if (!locationText) {
+        return;
+      }
 
-      locationText = input;
 
-    }
+      // =========================
+      // استخراج اسم الموقع
+      // =========================
 
-    status.textContent =
-      "📍 أبحث عن الموقع: " + locationText;
+      let locationText = input;
 
-    const location = await geocode(locationText);
 
-    const lat = Number(location.lat);
-    const lon = Number(location.lon);
+      for (const wordList of Object.values(categories)) {
 
-    map.setView([lat, lon], 12);
+        wordList.forEach(function(word) {
 
-    if (!category) {
+          const regex =
+            new RegExp(
+              word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+              "gi"
+            );
 
-      const marker = L.marker([lat, lon])
-        .addTo(map)
-        .bindPopup(
-          "<strong>" +
-          escapeHTML(location.display_name) +
-          "</strong>"
-        )
-        .openPopup();
+          locationText =
+            locationText.replace(regex, "");
 
-      markers.push(marker);
-
-      status.textContent =
-        "📍 تم العثور على: " +
-        location.display_name;
-
-      results.innerHTML = `
-        <div class="result">
-          <strong>${escapeHTML(location.name || location.display_name)}</strong>
-          <small>${escapeHTML(location.display_name)}</small>
-        </div>
-      `;
-
-      return;
-
-    }
-
-    status.textContent =
-      "🔎 أبحث عن " +
-      category.data.ar +
-      " بالقرب من " +
-      locationText +
-      "...";
-
-    let elements = await searchPlaces(
-      lat,
-      lon,
-      category.data.tags
-    );
-
-    // إزالة التكرارات
-    const unique = [];
-    const seen = new Set();
-
-    elements.forEach(element => {
-
-      const id = element.type + "/" + element.id;
-
-      if (!seen.has(id)) {
-
-        seen.add(id);
-        unique.push(element);
+        });
 
       }
 
-    });
 
-    if (!unique.length) {
+      locationText =
+        locationText
+          .replace(/\bفي\b/gi, "")
+          .replace(/\bحول\b/gi, "")
+          .replace(/\bnear\b/gi, "")
+          .replace(/\bin\b/gi, "")
+          .replace(/\s+/g, " ")
+          .trim();
 
-      status.textContent =
-        "❌ لم نجد نتائج قريبة.";
 
-      results.innerHTML =
-        '<div class="empty">جرّب مدينة أخرى أو نوع مكان آخر.</div>';
+      if (!locationText) {
 
-      return;
+        status.innerText =
+          "⚠️ اكتب اسم المدينة أو المنطقة.";
 
-    }
+        return;
+      }
 
-    const bounds = [];
 
-    unique.forEach((element, index) => {
+      // =========================
+      // تحديد الموقع
+      // =========================
 
-      let point;
+      status.innerText =
+        "🌍 أبحث عن " +
+        locationText +
+        "...";
 
-      if (element.type === "node") {
 
-        point = [
-          element.lat,
-          element.lon
-        ];
+      const place =
+        await geocode(locationText);
 
-      } else if (element.center) {
 
-        point = [
-          element.center.lat,
-          element.center.lon
-        ];
+      if (!place) {
+
+        status.innerText =
+          "❌ لم أجد المنطقة المطلوبة.";
+
+        return;
+      }
+
+
+      // =========================
+      // البحث عن الأماكن
+      // =========================
+
+      status.innerText =
+        "🔎 أبحث عن الأماكن الحقيقية...";
+
+
+      const tags =
+        getTags(category);
+
+
+      let elements =
+        await searchPlaces(
+          place.lat,
+          place.lon,
+          tags
+        );
+
+
+      // إزالة التكرار
+      const unique = new Map();
+
+
+      elements.forEach(function(element) {
+
+        const name =
+          element.tags &&
+          element.tags.name
+            ? element.tags.name
+            : "مكان بدون اسم";
+
+
+        const lat =
+          element.lat !== undefined
+            ? element.lat
+            : element.center?.lat;
+
+
+        const lon =
+          element.lon !== undefined
+            ? element.lon
+            : element.center?.lon;
+
+
+        if (
+          lat !== undefined &&
+          lon !== undefined
+        ) {
+
+          const key =
+            name +
+            "|" +
+            lat +
+            "|" +
+            lon;
+
+
+          unique.set(key, {
+            name,
+            lat,
+            lon,
+            tags: element.tags || {}
+          });
+
+        }
+
+      });
+
+
+      elements =
+        Array.from(unique.values());
+
+
+      // =========================
+      // عرض النتائج
+      // =========================
+
+      if (!elements.length) {
+
+        status.innerText =
+          "😕 لم أجد نتائج قريبة في قاعدة البيانات.";
+
+        map.setView(
+          [place.lat, place.lon],
+          12
+        );
+
+        return;
+      }
+
+
+      const bounds = [];
+
+
+      elements.forEach(function(item, index) {
+
+        const marker =
+          L.marker([
+            item.lat,
+            item.lon
+          ]).addTo(map);
+
+
+        marker.bindPopup(
+          "<b>" +
+          escapeHTML(item.name) +
+          "</b><br><br>" +
+          "📍 " +
+          item.lat.toFixed(5) +
+          ", " +
+          item.lon.toFixed(5)
+        );
+
+
+        markers.push(marker);
+
+
+        bounds.push([
+          item.lat,
+          item.lon
+        ]);
+
+
+        // نتيجة في القائمة
+        const div =
+          document.createElement("div");
+
+
+        div.className =
+          "result";
+
+
+        div.innerHTML = `
+          <div class="result-title">
+            ${index + 1}. ${escapeHTML(item.name)}
+          </div>
+
+          <div class="result-address">
+            📍 ${item.lat.toFixed(5)},
+            ${item.lon.toFixed(5)}
+          </div>
+        `;
+
+
+        div.onclick = function() {
+
+          map.setView(
+            [item.lat, item.lon],
+            16
+          );
+
+          marker.openPopup();
+
+        };
+
+
+        results.appendChild(div);
+
+      });
+
+
+      // =========================
+      // تكبير الخريطة على النتائج
+      // =========================
+
+      if (bounds.length === 1) {
+
+        map.setView(
+          bounds[0],
+          15
+        );
 
       } else {
 
-        return;
+        map.fitBounds(
+          bounds,
+          {
+            padding: [40, 40]
+          }
+        );
 
       }
 
-      const tags = element.tags || {};
 
-      const name =
-        tags.name ||
-        tags["name:en"] ||
-        category.data.ar;
+      status.innerText =
+        "✅ وجدت " +
+        elements.length +
+        " نتيجة حقيقية حول " +
+        locationText;
 
-      const marker = L.marker(point)
-        .addTo(map)
-        .bindPopup(
-          "<strong>" +
-          escapeHTML(name) +
-          "</strong>"
-        );
 
-      markers.push(marker);
+    } catch (error) {
 
-      bounds.push(point);
+      console.error(error);
 
-      const item = document.createElement("div");
-
-      item.className = "result";
-
-      item.innerHTML = `
-        <strong>${index + 1}. ${escapeHTML(name)}</strong>
-        <small>${escapeHTML(
-          tags["addr:street"] ||
-          tags["addr:city"] ||
-          category.data.ar
-        )}</small>
-      `;
-
-      item.onclick = () => {
-
-        map.setView(point, 16);
-        marker.openPopup();
-
-      };
-
-      results.appendChild(item);
-
-    });
-
-    if (bounds.length > 0) {
-
-      map.fitBounds(bounds, {
-        padding: [30, 30]
-      });
+      status.innerText =
+        "❌ حدث خطأ أثناء البحث. حاول مرة أخرى.";
 
     }
-
-    status.textContent =
-      `✅ وجدنا ${unique.length} نتيجة`;
-
-  } catch (error) {
-
-    console.error(error);
-
-    status.textContent =
-      "⚠️ حدث خطأ أثناء البحث.";
-
-    results.innerHTML = `
-      <div class="empty">
-        تعذر تنفيذ البحث. جرّب اسم مدينة واضح مثل:
-        نابلس، لندن، عمّان، باريس
-      </div>
-    `;
 
   }
 
-}
+
+  // =========================
+  // أمثلة البحث
+  // =========================
+
+  function setSearch(text) {
+
+    document.getElementById(
+      "searchInput"
+    ).value = text;
+
+    smartSearch();
+
+  }
 
 
-document
-  .getElementById("searchInput")
-  .addEventListener("keydown", function(event) {
+  // =========================
+  // زر Enter
+  // =========================
 
-    if (event.key === "Enter") {
-      smartSearch();
-    }
+  document
+    .getElementById("searchInput")
+    .addEventListener(
+      "keydown",
+      function(event) {
 
-  });
+        if (event.key === "Enter") {
+          smartSearch();
+        }
+
+      }
+    );
 
 </script>
 
 </body>
-</html>
+  </html>
