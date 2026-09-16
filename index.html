@@ -5,16 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WORLD MAP AI</title>
 
-  <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -24,70 +19,60 @@
     }
 
     header {
-      padding: 18px;
       text-align: center;
+      padding: 18px;
       background: #0b1728;
       border-bottom: 1px solid #20324a;
     }
 
-    header h1 {
-      margin: 0;
-      font-size: 25px;
-    }
+    h1 { margin: 0; font-size: 25px; }
 
     header p {
       margin: 6px 0 0;
       color: #9fb2c8;
-      font-size: 14px;
     }
 
-    .search-box {
-      padding: 14px;
-      background: #0b1728;
+    .search {
       display: flex;
       gap: 8px;
+      padding: 14px;
+      background: #0b1728;
     }
 
-    #searchInput {
+    input {
       flex: 1;
       padding: 14px;
-      border: 1px solid #30445d;
       border-radius: 12px;
+      border: 1px solid #30445d;
       background: #111f31;
       color: white;
       font-size: 16px;
       outline: none;
     }
 
-    #searchButton {
+    button {
+      padding: 0 18px;
       border: 0;
       border-radius: 12px;
-      padding: 0 18px;
       background: #238636;
       color: white;
-      font-size: 16px;
       font-weight: bold;
-    }
-
-    #searchButton:active {
-      transform: scale(0.97);
+      font-size: 16px;
     }
 
     #status {
-      padding: 8px 14px;
-      min-height: 36px;
+      padding: 10px 14px;
       color: #9fb2c8;
       background: #07111f;
-      font-size: 14px;
     }
 
     #map {
       width: 100%;
-      height: 65vh;
-      min-height: 420px;
+      height: 62vh;
+      min-height: 400px;
     }
 
-    .results {
+    #results {
       padding: 12px;
       background: #0b1728;
     }
@@ -98,7 +83,6 @@
       border: 1px solid #263a53;
       border-radius: 12px;
       background: #111f31;
-      cursor: pointer;
     }
 
     .result strong {
@@ -111,14 +95,9 @@
     }
 
     .empty {
-      color: #7f93aa;
       text-align: center;
+      color: #7f93aa;
       padding: 10px;
-    }
-
-    .leaflet-popup-content {
-      direction: rtl;
-      text-align: right;
     }
   </style>
 </head>
@@ -127,440 +106,566 @@
 
 <header>
   <h1>🌍 WORLD MAP AI</h1>
-  <p>مساعدك الجغرافي العالمي</p>
+  <p>مساعدك الجغرافي الذكي</p>
 </header>
 
-<div class="search-box">
+<div class="search">
   <input
     id="searchInput"
-    type="text"
-    placeholder="🔎 ابحث عن مدينة أو مكان..."
+    placeholder="🔎 مثال: مستشفيات نابلس"
     autocomplete="off"
   >
-  <button id="searchButton">بحث</button>
+  <button onclick="smartSearch()">بحث</button>
 </div>
 
 <div id="status">
-  اكتب اسم مكان ثم اضغط بحث 🔎
+  جرّب: مستشفيات نابلس أو جامعات لندن
 </div>
 
 <div id="map"></div>
 
-<div class="results" id="results">
-  <div class="empty">
-    نتائج البحث ستظهر هنا
-  </div>
+<div id="results">
+  <div class="empty">نتائج البحث ستظهر هنا</div>
 </div>
 
-<!-- Leaflet -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  // إنشاء الخريطة
-  const map = L.map("map").setView([31.95, 35.91], 7);
 
-  // OpenStreetMap
-  L.tileLayer(
-    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
+const map = L.map("map").setView([31.95, 35.91], 7);
+
+L.tileLayer(
+  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  {
+    maxZoom: 19,
+    attribution: "&copy; OpenStreetMap contributors"
+  }
+).addTo(map);
+
+let markers = [];
+
+const categories = {
+
+  "مستشفى": {
+    ar: "مستشفى",
+    tags: [
+      '["amenity"="hospital"]'
+    ]
+  },
+
+  "مستشفيات": {
+    ar: "مستشفى",
+    tags: [
+      '["amenity"="hospital"]'
+    ]
+  },
+
+  "hospital": {
+    ar: "مستشفى",
+    tags: [
+      '["amenity"="hospital"]'
+    ]
+  },
+
+  "hospitals": {
+    ar: "مستشفى",
+    tags: [
+      '["amenity"="hospital"]'
+    ]
+  },
+
+  "جامعة": {
+    ar: "جامعة",
+    tags: [
+      '["amenity"="university"]'
+    ]
+  },
+
+  "جامعات": {
+    ar: "جامعة",
+    tags: [
+      '["amenity"="university"]'
+    ]
+  },
+
+  "university": {
+    ar: "جامعة",
+    tags: [
+      '["amenity"="university"]'
+    ]
+  },
+
+  "universities": {
+    ar: "جامعة",
+    tags: [
+      '["amenity"="university"]'
+    ]
+  },
+
+  "مدرسة": {
+    ar: "مدرسة",
+    tags: [
+      '["amenity"="school"]'
+    ]
+  },
+
+  "مدارس": {
+    ar: "مدرسة",
+    tags: [
+      '["amenity"="school"]'
+    ]
+  },
+
+  "school": {
+    ar: "مدرسة",
+    tags: [
+      '["amenity"="school"]'
+    ]
+  },
+
+  "schools": {
+    ar: "مدرسة",
+    tags: [
+      '["amenity"="school"]'
+    ]
+  },
+
+  "مسجد": {
+    ar: "مسجد",
+    tags: [
+      '["amenity"="place_of_worship"]["religion"="muslim"]',
+      '["amenity"="place_of_worship"]'
+    ]
+  },
+
+  "مساجد": {
+    ar: "مسجد",
+    tags: [
+      '["amenity"="place_of_worship"]["religion"="muslim"]',
+      '["amenity"="place_of_worship"]'
+    ]
+  },
+
+  "mosque": {
+    ar: "مسجد",
+    tags: [
+      '["amenity"="place_of_worship"]["religion"="muslim"]',
+      '["amenity"="place_of_worship"]'
+    ]
+  },
+
+  "mosques": {
+    ar: "مسجد",
+    tags: [
+      '["amenity"="place_of_worship"]["religion"="muslim"]',
+      '["amenity"="place_of_worship"]'
+    ]
+  },
+
+  "ملعب": {
+    ar: "ملعب",
+    tags: [
+      '["leisure"="stadium"]'
+    ]
+  },
+
+  "ملاعب": {
+    ar: "ملعب",
+    tags: [
+      '["leisure"="stadium"]'
+    ]
+  },
+
+  "stadium": {
+    ar: "ملعب",
+    tags: [
+      '["leisure"="stadium"]'
+    ]
+  },
+
+  "stadiums": {
+    ar: "ملعب",
+    tags: [
+      '["leisure"="stadium"]'
+    ]
+  }
+
+};
+
+
+function clearMarkers() {
+
+  markers.forEach(marker => {
+    map.removeLayer(marker);
+  });
+
+  markers = [];
+}
+
+
+function escapeHTML(text) {
+
+  return String(text || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+
+function findCategory(text) {
+
+  const words = text.toLowerCase().split(/\s+/);
+
+  for (const word of words) {
+
+    if (categories[word]) {
+      return {
+        key: word,
+        data: categories[word]
+      };
     }
-  ).addTo(map);
 
-  let markers = [];
-
-  const input = document.getElementById("searchInput");
-  const button = document.getElementById("searchButton");
-  const status = document.getElementById("status");
-  const resultsBox = document.getElementById("results");
-
-  function clearMarkers() {
-    markers.forEach(marker => map.removeLayer(marker));
-    markers = [];
   }
 
-  function addMarker(place) {
-    const lat = Number(place.lat);
-    const lon = Number(place.lon);
+  for (const key in categories) {
 
-    const marker = L.marker([lat, lon]).addTo(map);
-
-    marker.bindPopup(`
-      <strong>${escapeHTML(place.display_name)}</strong>
-    `);
-
-    markers.push(marker);
-
-    return marker;
-  }
-
-  function escapeHTML(text) {
-    return String(text)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  async function searchPlace() {
-    const query = input.value.trim();
-
-    if (!query) {
-      status.textContent = "اكتب اسم مكان أولًا 🔎";
-      return;
+    if (text.toLowerCase().includes(key)) {
+      return {
+        key: key,
+        data: categories[key]
+      };
     }
 
-    status.textContent = "🔄 جاري البحث...";
-    resultsBox.innerHTML = "";
-
-    try {
-      const url =
-        "https://nominatim.openstreetmap.org/search" +
-        "?format=jsonv2" +
-        "&limit=10" +
-        "&q=" +
-        encodeURIComponent(query);
-
-      const response = await fetch(url, {
-        headers: {
-          "Accept": "application/json"
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error("Search failed");
-      }
-
-      const places = await response.json();
-
-      clearMarkers();
-
-      if (!places.length) {
-        status.textContent = "❌ لم نجد نتائج لهذا البحث.";
-        resultsBox.innerHTML =
-          '<div class="empty">جرّب اسم مدينة أو مكان مختلف.</div>';
-        return;
-      }
-
-      status.textContent =
-        `✅ وجدنا ${places.length} نتيجة`;
-
-      places.forEach((place, index) => {
-        const marker = addMarker(place);
-
-        const item = document.createElement("div");
-        item.className = "result";
-
-        item.innerHTML = `
-          <strong>${index + 1}. ${escapeHTML(
-            place.name || place.display_name
-          )}</strong>
-          <small>${escapeHTML(place.display_name)}</small>
-        `;
-
-        item.addEventListener("click", () => {
-          const lat = Number(place.lat);
-          const lon = Number(place.lon);
-
-          map.setView([lat, lon], 15);
-          marker.openPopup();
-        });
-
-        resultsBox.appendChild(item);
-      });
-
-      const first = places[0];
-
-      map.setView(
-        [Number(first.lat), Number(first.lon)],
-        12
-      );
-
-    } catch (error) {
-      console.error(error);
-
-      status.textContent =
-        "⚠️ حدث خطأ أثناء البحث. حاول مرة أخرى.";
-
-      resultsBox.innerHTML =
-        '<div class="empty">تعذر الاتصال بخدمة البحث.</div>';
-    }
   }
 
-  button.addEventListener("click", searchPlace);
+  return null;
+}
 
-  input.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      searchPlace();
+
+async function geocode(placeName) {
+
+  const url =
+    "https://nominatim.openstreetmap.org/search" +
+    "?format=jsonv2" +
+    "&limit=1" +
+    "&q=" +
+    encodeURIComponent(placeName);
+
+  const response = await fetch(url, {
+    headers: {
+      "Accept": "application/json"
     }
   });
-</script>
 
-</body>
-</html>
-    header p {
-      margin: 6px 0 0;
-      color: #9fb2c8;
-      font-size: 14px;
-    }
-
-    .search-box {
-      padding: 14px;
-      background: #0b1728;
-      display: flex;
-      gap: 8px;
-    }
-
-    #searchInput {
-      flex: 1;
-      padding: 14px;
-      border: 1px solid #30445d;
-      border-radius: 12px;
-      background: #111f31;
-      color: white;
-      font-size: 16px;
-      outline: none;
-    }
-
-    #searchButton {
-      border: 0;
-      border-radius: 12px;
-      padding: 0 18px;
-      background: #238636;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-    }
-
-    #searchButton:active {
-      transform: scale(0.97);
-    }
-
-    #status {
-      padding: 8px 14px;
-      min-height: 36px;
-      color: #9fb2c8;
-      background: #07111f;
-      font-size: 14px;
-    }
-
-    #map {
-      width: 100%;
-      height: 65vh;
-      min-height: 420px;
-    }
-
-    .results {
-      padding: 12px;
-      background: #0b1728;
-    }
-
-    .result {
-      padding: 12px;
-      margin-bottom: 8px;
-      border: 1px solid #263a53;
-      border-radius: 12px;
-      background: #111f31;
-      cursor: pointer;
-    }
-
-    .result strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .result small {
-      color: #9fb2c8;
-    }
-
-    .empty {
-      color: #7f93aa;
-      text-align: center;
-      padding: 10px;
-    }
-
-    .leaflet-popup-content {
-      direction: rtl;
-      text-align: right;
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
-  <h1>🌍 WORLD MAP AI</h1>
-  <p>مساعدك الجغرافي العالمي</p>
-</header>
-
-<div class="search-box">
-  <input
-    id="searchInput"
-    type="text"
-    placeholder="🔎 ابحث عن مدينة أو مكان..."
-    autocomplete="off"
-  >
-  <button id="searchButton">بحث</button>
-</div>
-
-<div id="status">
-  اكتب اسم مكان ثم اضغط بحث 🔎
-</div>
-
-<div id="map"></div>
-
-<div class="results" id="results">
-  <div class="empty">
-    نتائج البحث ستظهر هنا
-  </div>
-</div>
-
-<!-- Leaflet -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-  // إنشاء الخريطة
-  const map = L.map("map").setView([31.95, 35.91], 7);
-
-  // OpenStreetMap
-  L.tileLayer(
-    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-    {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
-    }
-  ).addTo(map);
-
-  let markers = [];
-
-  const input = document.getElementById("searchInput");
-  const button = document.getElementById("searchButton");
-  const status = document.getElementById("status");
-  const resultsBox = document.getElementById("results");
-
-  function clearMarkers() {
-    markers.forEach(marker => map.removeLayer(marker));
-    markers = [];
+  if (!response.ok) {
+    throw new Error("Geocoding failed");
   }
 
-  function addMarker(place) {
-    const lat = Number(place.lat);
-    const lon = Number(place.lon);
+  const data = await response.json();
 
-    const marker = L.marker([lat, lon]).addTo(map);
+  if (!data.length) {
+    throw new Error("Location not found");
+  }
 
-    marker.bindPopup(`
-      <strong>${escapeHTML(place.display_name)}</strong>
+  return data[0];
+}
+
+
+async function searchPlaces(lat, lon, tags) {
+
+  let queryParts = [];
+
+  tags.forEach(tag => {
+
+    queryParts.push(`
+      node${tag}(around:10000,${lat},${lon});
+      way${tag}(around:10000,${lat},${lon});
+      relation${tag}(around:10000,${lat},${lon});
     `);
 
-    markers.push(marker);
+  });
 
-    return marker;
-  }
+  const query = `
+    [out:json][timeout:30];
+    (
+      ${queryParts.join("")}
+    );
+    out center tags;
+  `;
 
-  function escapeHTML(text) {
-    return String(text)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
+  const servers = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter"
+  ];
 
-  async function searchPlace() {
-    const query = input.value.trim();
-
-    if (!query) {
-      status.textContent = "اكتب اسم مكان أولًا 🔎";
-      return;
-    }
-
-    status.textContent = "🔄 جاري البحث...";
-    resultsBox.innerHTML = "";
+  for (const server of servers) {
 
     try {
-      const url =
-        "https://nominatim.openstreetmap.org/search" +
-        "?format=jsonv2" +
-        "&limit=10" +
-        "&q=" +
-        encodeURIComponent(query);
 
-      const response = await fetch(url, {
+      const response = await fetch(server, {
+        method: "POST",
         headers: {
-          "Accept": "application/json"
-        }
+          "Content-Type": "text/plain;charset=UTF-8"
+        },
+        body: query
       });
 
-      if (!response.ok) {
-        throw new Error("Search failed");
-      }
+      if (!response.ok) continue;
 
-      const places = await response.json();
+      const data = await response.json();
 
-      clearMarkers();
-
-      if (!places.length) {
-        status.textContent = "❌ لم نجد نتائج لهذا البحث.";
-        resultsBox.innerHTML =
-          '<div class="empty">جرّب اسم مدينة أو مكان مختلف.</div>';
-        return;
-      }
-
-      status.textContent =
-        `✅ وجدنا ${places.length} نتيجة`;
-
-      places.forEach((place, index) => {
-        const marker = addMarker(place);
-
-        const item = document.createElement("div");
-        item.className = "result";
-
-        item.innerHTML = `
-          <strong>${index + 1}. ${escapeHTML(
-            place.name || place.display_name
-          )}</strong>
-          <small>${escapeHTML(place.display_name)}</small>
-        `;
-
-        item.addEventListener("click", () => {
-          const lat = Number(place.lat);
-          const lon = Number(place.lon);
-
-          map.setView([lat, lon], 15);
-          marker.openPopup();
-        });
-
-        resultsBox.appendChild(item);
-      });
-
-      const first = places[0];
-
-      map.setView(
-        [Number(first.lat), Number(first.lon)],
-        12
-      );
+      return data.elements || [];
 
     } catch (error) {
-      console.error(error);
 
-      status.textContent =
-        "⚠️ حدث خطأ أثناء البحث. حاول مرة أخرى.";
+      console.log("Overpass server failed:", server);
 
-      resultsBox.innerHTML =
-        '<div class="empty">تعذر الاتصال بخدمة البحث.</div>';
     }
+
   }
 
-  button.addEventListener("click", searchPlace);
+  throw new Error("All map servers failed");
+}
 
-  input.addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      searchPlace();
+
+async function smartSearch() {
+
+  const input = document
+    .getElementById("searchInput")
+    .value
+    .trim();
+
+  const status = document.getElementById("status");
+  const results = document.getElementById("results");
+
+  if (!input) {
+
+    status.textContent = "اكتب طلب البحث أولًا 🔎";
+    return;
+
+  }
+
+  status.textContent = "🤖 WORLD MAP AI يفهم طلبك...";
+
+  results.innerHTML = "";
+
+  clearMarkers();
+
+  try {
+
+    const category = findCategory(input);
+
+    let locationText = input;
+
+    if (category) {
+
+      locationText = input
+        .replace(new RegExp(category.key, "ig"), "")
+        .replace("في", "")
+        .replace("حول", "")
+        .replace("near", "")
+        .replace("in", "")
+        .trim();
+
     }
+
+    if (!locationText) {
+
+      locationText = input;
+
+    }
+
+    status.textContent =
+      "📍 أبحث عن الموقع: " + locationText;
+
+    const location = await geocode(locationText);
+
+    const lat = Number(location.lat);
+    const lon = Number(location.lon);
+
+    map.setView([lat, lon], 12);
+
+    if (!category) {
+
+      const marker = L.marker([lat, lon])
+        .addTo(map)
+        .bindPopup(
+          "<strong>" +
+          escapeHTML(location.display_name) +
+          "</strong>"
+        )
+        .openPopup();
+
+      markers.push(marker);
+
+      status.textContent =
+        "📍 تم العثور على: " +
+        location.display_name;
+
+      results.innerHTML = `
+        <div class="result">
+          <strong>${escapeHTML(location.name || location.display_name)}</strong>
+          <small>${escapeHTML(location.display_name)}</small>
+        </div>
+      `;
+
+      return;
+
+    }
+
+    status.textContent =
+      "🔎 أبحث عن " +
+      category.data.ar +
+      " بالقرب من " +
+      locationText +
+      "...";
+
+    let elements = await searchPlaces(
+      lat,
+      lon,
+      category.data.tags
+    );
+
+    // إزالة التكرارات
+    const unique = [];
+    const seen = new Set();
+
+    elements.forEach(element => {
+
+      const id = element.type + "/" + element.id;
+
+      if (!seen.has(id)) {
+
+        seen.add(id);
+        unique.push(element);
+
+      }
+
+    });
+
+    if (!unique.length) {
+
+      status.textContent =
+        "❌ لم نجد نتائج قريبة.";
+
+      results.innerHTML =
+        '<div class="empty">جرّب مدينة أخرى أو نوع مكان آخر.</div>';
+
+      return;
+
+    }
+
+    const bounds = [];
+
+    unique.forEach((element, index) => {
+
+      let point;
+
+      if (element.type === "node") {
+
+        point = [
+          element.lat,
+          element.lon
+        ];
+
+      } else if (element.center) {
+
+        point = [
+          element.center.lat,
+          element.center.lon
+        ];
+
+      } else {
+
+        return;
+
+      }
+
+      const tags = element.tags || {};
+
+      const name =
+        tags.name ||
+        tags["name:en"] ||
+        category.data.ar;
+
+      const marker = L.marker(point)
+        .addTo(map)
+        .bindPopup(
+          "<strong>" +
+          escapeHTML(name) +
+          "</strong>"
+        );
+
+      markers.push(marker);
+
+      bounds.push(point);
+
+      const item = document.createElement("div");
+
+      item.className = "result";
+
+      item.innerHTML = `
+        <strong>${index + 1}. ${escapeHTML(name)}</strong>
+        <small>${escapeHTML(
+          tags["addr:street"] ||
+          tags["addr:city"] ||
+          category.data.ar
+        )}</small>
+      `;
+
+      item.onclick = () => {
+
+        map.setView(point, 16);
+        marker.openPopup();
+
+      };
+
+      results.appendChild(item);
+
+    });
+
+    if (bounds.length > 0) {
+
+      map.fitBounds(bounds, {
+        padding: [30, 30]
+      });
+
+    }
+
+    status.textContent =
+      `✅ وجدنا ${unique.length} نتيجة`;
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.textContent =
+      "⚠️ حدث خطأ أثناء البحث.";
+
+    results.innerHTML = `
+      <div class="empty">
+        تعذر تنفيذ البحث. جرّب اسم مدينة واضح مثل:
+        نابلس، لندن، عمّان، باريس
+      </div>
+    `;
+
+  }
+
+}
+
+
+document
+  .getElementById("searchInput")
+  .addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+      smartSearch();
+    }
+
   });
+
 </script>
 
 </body>
