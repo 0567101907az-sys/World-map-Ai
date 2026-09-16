@@ -2,1490 +2,815 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <title>WORLD MAP AI 2.0</title>
+  <title>TERRA X</title>
 
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
   <style>
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    body {
+    html, body {
       margin: 0;
-      background: #0b1220;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #05070b;
       color: white;
       font-family: Arial, sans-serif;
+      overflow: hidden;
     }
 
-    header {
-      background: #111c31;
-      padding: 18px;
+    #map {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    /* ================= HEADER ================= */
+
+    .topbar {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 1000;
+
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      padding: 10px 12px;
+
+      background: rgba(7, 10, 16, 0.90);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 18px;
+
+      backdrop-filter: blur(15px);
+      box-shadow: 0 10px 35px rgba(0,0,0,0.35);
+    }
+
+    .logo {
+      min-width: 92px;
       text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      border-bottom: 1px solid #263653;
     }
 
-    .subtitle {
-      font-size: 13px;
-      color: #9fb0c9;
-      margin-top: 5px;
+    .logo-main {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 2px;
     }
 
-    .search-box {
-      padding: 15px;
-      background: #0f192b;
+    .logo-sub {
+      font-size: 8px;
+      color: #8e99aa;
+      letter-spacing: 1.5px;
+      margin-top: 2px;
+    }
+
+    .searchBox {
+      flex: 1;
+      display: flex;
+      gap: 6px;
     }
 
     #searchInput {
       width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid #334563;
-      background: #17243a;
-      color: white;
-      font-size: 16px;
+      min-width: 0;
+
+      border: 1px solid rgba(255,255,255,0.10);
       outline: none;
+
+      background: rgba(255,255,255,0.07);
+      color: white;
+
+      border-radius: 12px;
+      padding: 12px;
+
+      font-size: 14px;
     }
 
     #searchInput::placeholder {
-      color: #8b9ab2;
+      color: #8992a2;
     }
 
-    button {
-      width: 100%;
-      margin-top: 9px;
-      padding: 13px;
-      border: none;
+    .searchBtn {
+      width: 45px;
+      border: 0;
       border-radius: 12px;
-      color: white;
-      font-size: 16px;
+      background: white;
+      color: #05070b;
+      font-size: 18px;
       font-weight: bold;
-      cursor: pointer;
     }
 
-    #searchBtn {
-      background: #2563eb;
+    /* ================= BOTTOM PANEL ================= */
+
+    .bottomPanel {
+      position: fixed;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      z-index: 1000;
+
+      background: rgba(7, 10, 16, 0.93);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 22px;
+
+      padding: 12px;
+
+      backdrop-filter: blur(18px);
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.35);
     }
 
-    #locationBtn {
-      background: #16805c;
+    .handle {
+      width: 42px;
+      height: 4px;
+      border-radius: 10px;
+      background: #596273;
+      margin: 0 auto 12px;
     }
 
-    button:active {
-      transform: scale(.98);
-    }
-
-    .examples {
-      display: flex;
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      overflow-x: auto;
-      padding-top: 10px;
     }
 
-    .example {
-      white-space: nowrap;
-      background: #1a2942;
-      border: 1px solid #334563;
-      color: #dbe7f8;
-      padding: 8px 12px;
+    .tool {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.055);
+      color: white;
+
+      border-radius: 15px;
+      padding: 11px 4px;
+
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .tool span {
+      display: block;
+      font-size: 21px;
+      margin-bottom: 5px;
+    }
+
+    .tool:active {
+      transform: scale(0.96);
+    }
+
+    /* ================= LOCATION BUTTON ================= */
+
+    .locationBtn {
+      position: fixed;
+      right: 20px;
+      bottom: 205px;
+
+      z-index: 999;
+
+      width: 50px;
+      height: 50px;
+
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+
+      background: rgba(7,10,16,0.92);
+      color: white;
+
+      font-size: 21px;
+
+      box-shadow: 0 8px 25px rgba(0,0,0,0.35);
+    }
+
+    /* ================= SIDE CARD ================= */
+
+    .infoCard {
+      position: fixed;
+      top: 92px;
+      left: 12px;
+      right: 12px;
+
+      z-index: 900;
+
+      display: none;
+
+      background: rgba(7,10,16,0.94);
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 20px;
-      font-size: 13px;
-    }
 
-    #status {
-      padding: 10px 15px;
-      color: #9fb0c9;
-      font-size: 14px;
-      min-height: 38px;
-    }
-
-    #map {
-      width: 100%;
-      height: 58vh;
-      min-height: 400px;
-    }
-
-    #results {
       padding: 15px;
+
+      backdrop-filter: blur(18px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
     }
 
-    .result {
-      background: #131f34;
-      border: 1px solid #263653;
-      border-radius: 12px;
-      padding: 13px;
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-
-    .result:hover {
-      background: #192943;
-    }
-
-    .result-title {
+    .infoTitle {
       font-size: 16px;
       font-weight: bold;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
     }
 
-    .result-info {
-      color: #b3c0d3;
-      font-size: 13px;
+    .infoText {
+      color: #aab3c2;
+      font-size: 12px;
       line-height: 1.7;
     }
 
-    .distance {
-      color: #60d6a2;
-      font-weight: bold;
+    .closeBtn {
+      float: left;
+      border: 0;
+      background: transparent;
+      color: #8992a2;
+      font-size: 18px;
     }
 
-    .direction {
-      color: #8db7ff;
+    /* ================= RESULTS ================= */
+
+    #results {
+      max-height: 170px;
+      overflow-y: auto;
+      margin-top: 10px;
     }
 
-    footer {
-      text-align: center;
-      padding: 15px;
-      color: #65758f;
+    .result {
+      padding: 9px;
+      margin-bottom: 6px;
+
+      border-radius: 12px;
+      background: rgba(255,255,255,0.05);
+
       font-size: 12px;
+    }
+
+    .result small {
+      display: block;
+      color: #8992a2;
+      margin-top: 4px;
+    }
+
+    /* ================= STATUS ================= */
+
+    .status {
+      text-align: center;
+      color: #7f8999;
+      font-size: 10px;
+      margin-top: 8px;
+    }
+
+    /* ================= LEAFLET ================= */
+
+    .leaflet-control-layers {
+      background: rgba(7,10,16,0.92) !important;
+      color: white !important;
+      border: 1px solid rgba(255,255,255,0.10) !important;
+      border-radius: 12px !important;
+    }
+
+    .leaflet-control-layers label {
+      color: white;
+    }
+
+    .leaflet-control-zoom {
+      display: none;
+    }
+
+    @media (max-width: 430px) {
+      .logo {
+        min-width: 80px;
+      }
+
+      .logo-main {
+        font-size: 17px;
+      }
+
+      .tool {
+        font-size: 10px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<header>
-  🌍 WORLD MAP AI
-  <div class="subtitle">WORLD MAP AI 2.0 — خريطة ذكية للعالم</div>
-</header>
+  <!-- MAP -->
+  <div id="map"></div>
 
-<div class="search-box">
+  <!-- HEADER -->
+  <div class="topbar">
 
-  <input
-    id="searchInput"
-    type="text"
-    placeholder="مثال: مستشفيات نابلس أو جامعات لندن">
-
-  <button id="searchBtn" onclick="smartSearch()">
-    🔎 بحث ذكي
-  </button>
-
-  <button id="locationBtn" onclick="getMyLocation()">
-    📍 موقعي الآن
-  </button>
-
-  <div class="examples">
-
-    <div class="example"
-         onclick="setSearch('مستشفيات نابلس')">
-      🏥 مستشفيات نابلس
+    <div class="logo">
+      <div class="logo-main">TERRA X</div>
+      <div class="logo-sub">SEE THE WORLD DIFFERENTLY</div>
     </div>
 
-    <div class="example"
-         onclick="setSearch('جامعات لندن')">
-      🎓 جامعات لندن
-    </div>
+    <div class="searchBox">
 
-    <div class="example"
-         onclick="setSearch('مساجد القدس')">
-      🕌 مساجد القدس
-    </div>
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="ابحث عن مدينة، مكان، مستشفى..."
+      >
 
-    <div class="example"
-         onclick="setSearch('مدارس نابلس')">
-      🏫 مدارس نابلس
-    </div>
+      <button class="searchBtn" onclick="smartSearch()">⌕</button>
 
-    <div class="example"
-         onclick="setSearch('مطاعم نابلس')">
-      🍽️ مطاعم نابلس
-    </div>
-
-    <div class="example"
-         onclick="setSearch('stadiums in Barcelona')">
-      🏟️ ملاعب برشلونة
     </div>
 
   </div>
-</div>
 
-<div id="status">
-  جاهز 🚀
-</div>
+  <!-- INFO CARD -->
+  <div class="infoCard" id="infoCard">
 
-<div id="map"></div>
+    <button class="closeBtn" onclick="closeInfo()">✕</button>
 
-<div id="results"></div>
+    <div class="infoTitle" id="infoTitle">
+      TERRA X
+    </div>
 
-<footer>
-  WORLD MAP AI 2.0 — OpenStreetMap & Esri
-</footer>
+    <div class="infoText" id="infoText">
+      جاهز لتحليل العالم.
+    </div>
 
+    <div id="results"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <div class="status" id="status"></div>
 
-<script>
+  </div>
 
-/* =====================================================
-   الخرائط
-===================================================== */
+  <!-- LOCATION -->
+  <button
+    class="locationBtn"
+    onclick="getMyLocation()"
+    title="موقعي"
+  >
+    📍
+  </button>
 
-const street = L.tileLayer(
-  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-  {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap contributors"
-  }
-);
+  <!-- BOTTOM PANEL -->
+  <div class="bottomPanel">
 
-const satellite = L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  {
-    maxZoom: 19,
-    attribution: "Tiles &copy; Esri"
-  }
-);
+    <div class="handle"></div>
 
-const terrain = L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
-  {
-    maxZoom: 13,
-    attribution: "Tiles &copy; Esri"
-  }
-);
+    <div class="tools">
 
-const map = L.map("map", {
-  center: [31.95, 35.91],
-  zoom: 7,
-  layers: [street]
-});
+      <button class="tool" onclick="populationAI()">
+        <span>👥</span>
+        Population AI
+      </button>
 
-L.control.layers(
-  {
-    "🗺️ الشوارع": street,
-    "🛰️ قمر صناعي": satellite,
-    "⛰️ تضاريس": terrain
-  },
-  null,
-  {
-    position: "topright"
-  }
-).addTo(map);
+      <button class="tool" onclick="satelliteCompare()">
+        <span>🛰️</span>
+        Satellite
+      </button>
 
+      <button class="tool" onclick="analysisMode()">
+        <span>📊</span>
+        Analysis
+      </button>
 
-/* =====================================================
-   المتغيرات
-===================================================== */
+      <button class="tool" onclick="drawMode()">
+        <span>✏️</span>
+        تحديد منطقة
+      </button>
 
-let markers = [];
+    </div>
 
-let userMarker = null;
-let accuracyCircle = null;
+  </div>
 
-let userLocation = null;
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <script>
 
-/* =====================================================
-   أنواع الأماكن
-===================================================== */
+    /* =====================================================
+       MAP LAYERS
+    ===================================================== */
 
-const categories = {
-
-  hospital: [
-    "مستشفى",
-    "مستشفيات",
-    "hospital",
-    "hospitals"
-  ],
-
-  university: [
-    "جامعة",
-    "جامعات",
-    "university",
-    "universities"
-  ],
-
-  school: [
-    "مدرسة",
-    "مدارس",
-    "school",
-    "schools"
-  ],
-
-  mosque: [
-    "مسجد",
-    "مساجد",
-    "mosque",
-    "mosques"
-  ],
-
-  stadium: [
-    "ملعب",
-    "ملاعب",
-    "stadium",
-    "stadiums"
-  ],
-
-  police: [
-    "شرطة",
-    "مركز شرطة",
-    "police"
-  ],
-
-  pharmacy: [
-    "صيدلية",
-    "صيدليات",
-    "pharmacy",
-    "pharmacies"
-  ],
-
-  hotel: [
-    "فندق",
-    "فنادق",
-    "hotel",
-    "hotels"
-  ],
-
-  restaurant: [
-    "مطعم",
-    "مطاعم",
-    "restaurant",
-    "restaurants"
-  ],
-
-  airport: [
-    "مطار",
-    "مطارات",
-    "airport",
-    "airports"
-  ]
-};
-
-
-/* =====================================================
-   تنظيف العلامات
-===================================================== */
-
-function clearMarkers() {
-
-  markers.forEach(function(marker) {
-    map.removeLayer(marker);
-  });
-
-  markers = [];
-}
-
-
-/* =====================================================
-   حماية النص
-===================================================== */
-
-function escapeHTML(text) {
-
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-
-/* =====================================================
-   معرفة نوع المكان
-===================================================== */
-
-function findCategory(text) {
-
-  const lower = text.toLowerCase();
-
-  for (const category in categories) {
-
-    for (const word of categories[category]) {
-
-      if (lower.includes(word.toLowerCase())) {
-        return category;
+    const street = L.tileLayer(
+      "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
       }
-
-    }
-  }
-
-  return null;
-}
-
-
-/* =====================================================
-   OSM TAGS
-===================================================== */
-
-function getTags(category) {
-
-  if (category === "hospital")
-    return ['[amenity="hospital"]'];
-
-  if (category === "university")
-    return ['[amenity="university"]'];
-
-  if (category === "school")
-    return ['[amenity="school"]'];
-
-  if (category === "mosque")
-    return [
-      '[amenity="place_of_worship"][religion="muslim"]',
-      '[amenity="place_of_worship"]'
-    ];
-
-  if (category === "stadium")
-    return ['[leisure="stadium"]'];
-
-  if (category === "police")
-    return ['[amenity="police"]'];
-
-  if (category === "pharmacy")
-    return ['[amenity="pharmacy"]'];
-
-  if (category === "hotel")
-    return ['[tourism="hotel"]'];
-
-  if (category === "restaurant")
-    return ['[amenity="restaurant"]'];
-
-  if (category === "airport")
-    return ['[aeroway="aerodrome"]'];
-
-  return [];
-}
-
-
-/* =====================================================
-   تحديد موقع مدينة
-===================================================== */
-
-async function geocode(placeName) {
-
-  const url =
-    "https://nominatim.openstreetmap.org/search" +
-    "?format=jsonv2" +
-    "&limit=1" +
-    "&q=" +
-    encodeURIComponent(placeName);
-
-  const response = await fetch(url, {
-    headers: {
-      "Accept": "application/json"
-    }
-  });
-
-  if (!response.ok) {
-    throw new Error("Geocoding failed");
-  }
-
-  const data = await response.json();
-
-  if (!data.length) {
-    return null;
-  }
-
-  return {
-    lat: parseFloat(data[0].lat),
-    lon: parseFloat(data[0].lon),
-    display: data[0].display_name
-  };
-}
-
-
-/* =====================================================
-   البحث في Overpass
-===================================================== */
-
-async function searchPlaces(lat, lon, tags) {
-
-  const servers = [
-
-    "https://overpass-api.de/api/interpreter",
-
-    "https://overpass.kumi.systems/api/interpreter"
-
-  ];
-
-  for (const server of servers) {
-
-    try {
-
-      let queryParts = [];
-
-      tags.forEach(function(tag) {
-
-        queryParts.push(
-          `node(around:10000,${lat},${lon})${tag};`
-        );
-
-        queryParts.push(
-          `way(around:10000,${lat},${lon})${tag};`
-        );
-
-        queryParts.push(
-          `relation(around:10000,${lat},${lon})${tag};`
-        );
-
-      });
-
-      const query = `
-        [out:json][timeout:25];
-        (
-          ${queryParts.join("\n")}
-        );
-        out center tags;
-      `;
-
-      const response = await fetch(server, {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
-        body:
-          "data=" +
-          encodeURIComponent(query)
-      });
-
-      if (!response.ok) {
-        continue;
-      }
-
-      const data = await response.json();
-
-      return data.elements || [];
-
-    } catch (error) {
-
-      console.log(
-        "Overpass failed:",
-        server
-      );
-
-    }
-  }
-
-  throw new Error(
-    "All Overpass servers failed"
-  );
-}
-
-
-/* =====================================================
-   المسافة بين نقطتين
-   Haversine
-===================================================== */
-
-function calculateDistance(
-  lat1,
-  lon1,
-  lat2,
-  lon2
-) {
-
-  const R = 6371;
-
-  const dLat =
-    (lat2 - lat1) *
-    Math.PI / 180;
-
-  const dLon =
-    (lon2 - lon1) *
-    Math.PI / 180;
-
-  const a =
-    Math.sin(dLat / 2) *
-    Math.sin(dLat / 2) +
-
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
-
-  const c =
-    2 *
-    Math.atan2(
-      Math.sqrt(a),
-      Math.sqrt(1 - a)
     );
 
-  return R * c;
-}
-
-
-/* =====================================================
-   اتجاه المكان
-===================================================== */
-
-function getDirection(
-  lat1,
-  lon1,
-  lat2,
-  lon2
-) {
-
-  const dLon =
-    (lon2 - lon1) *
-    Math.PI / 180;
-
-  const y =
-    Math.sin(dLon) *
-    Math.cos(lat2 * Math.PI / 180);
-
-  const x =
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.sin(lat2 * Math.PI / 180) -
-
-    Math.sin(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-    Math.cos(dLon);
-
-  let bearing =
-    Math.atan2(y, x) *
-    180 / Math.PI;
-
-  bearing =
-    (bearing + 360) % 360;
-
-
-  if (bearing >= 337.5 || bearing < 22.5)
-    return "⬆️ شمال";
-
-  if (bearing < 67.5)
-    return "↗️ شمال شرق";
-
-  if (bearing < 112.5)
-    return "➡️ شرق";
-
-  if (bearing < 157.5)
-    return "↘️ جنوب شرق";
-
-  if (bearing < 202.5)
-    return "⬇️ جنوب";
-
-  if (bearing < 247.5)
-    return "↙️ جنوب غرب";
-
-  if (bearing < 292.5)
-    return "⬅️ غرب";
-
-  return "↖️ شمال غرب";
-}
-
-
-/* =====================================================
-   موقعي الآن
-===================================================== */
-
-function getMyLocation() {
-
-  const status =
-    document.getElementById("status");
-
-  if (!navigator.geolocation) {
-
-    status.innerText =
-      "❌ جهازك لا يدعم تحديد الموقع.";
-
-    return;
-  }
-
-  status.innerText =
-    "📍 جاري تحديد موقعك...";
-
-
-  navigator.geolocation.getCurrentPosition(
-
-    function(position) {
-
-      const lat =
-        position.coords.latitude;
-
-      const lon =
-        position.coords.longitude;
-
-      const accuracy =
-        position.coords.accuracy;
-
-
-      userLocation = {
-        lat: lat,
-        lon: lon
-      };
-
-
-      // إزالة الموقع القديم
-      if (userMarker) {
-        map.removeLayer(userMarker);
+    const satellite = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      {
+        maxZoom: 19,
+        attribution: "Tiles &copy; Esri"
       }
-
-      if (accuracyCircle) {
-        map.removeLayer(accuracyCircle);
-      }
-
-
-      // دائرة الدقة
-      accuracyCircle =
-        L.circle(
-          [lat, lon],
-          {
-            radius: accuracy,
-            weight: 2,
-            fillOpacity: 0.12
-          }
-        ).addTo(map);
-
-
-      // علامة المستخدم
-      userMarker =
-        L.marker(
-          [lat, lon]
-        ).addTo(map);
-
-
-      userMarker.bindPopup(
-        "<b>📍 أنت هنا</b><br>" +
-        "دقة تقريبية: " +
-        Math.round(accuracy) +
-        " متر"
-      ).openPopup();
-
-
-      map.setView(
-        [lat, lon],
-        15
-      );
-
-
-      status.innerText =
-        "✅ تم تحديد موقعك بنجاح 📍";
-
-
-      // تحديث المسافات إذا كانت النتائج موجودة
-      updateDistances();
-
-    },
-
-    function(error) {
-
-      let message =
-        "❌ لم أستطع تحديد موقعك.";
-
-      if (error.code === 1) {
-        message =
-          "⚠️ اسمح للموقع من المتصفح حتى أقدر أحدد مكانك.";
-      }
-
-      if (error.code === 2) {
-        message =
-          "⚠️ تعذر الحصول على موقعك حالياً.";
-      }
-
-      if (error.code === 3) {
-        message =
-          "⚠️ انتهى وقت تحديد الموقع.";
-      }
-
-      status.innerText = message;
-
-    },
-
-    {
-      enableHighAccuracy: true,
-      timeout: 15000,
-      maximumAge: 0
-    }
-
-  );
-}
-
-
-/* =====================================================
-   تحديث المسافات
-===================================================== */
-
-function updateDistances() {
-
-  if (!userLocation) {
-    return;
-  }
-
-  const resultElements =
-    document.querySelectorAll(".result");
-
-
-  resultElements.forEach(function(div) {
-
-    const lat =
-      parseFloat(
-        div.dataset.lat
-      );
-
-    const lon =
-      parseFloat(
-        div.dataset.lon
-      );
-
-    if (
-      isNaN(lat) ||
-      isNaN(lon)
-    ) {
-      return;
-    }
-
-
-    const distance =
-      calculateDistance(
-        userLocation.lat,
-        userLocation.lon,
-        lat,
-        lon
-      );
-
-
-    const direction =
-      getDirection(
-        userLocation.lat,
-        userLocation.lon,
-        lat,
-        lon
-      );
-
-
-    const info =
-      div.querySelector(".distanceInfo");
-
-
-    if (info) {
-
-      info.innerHTML =
-        `<span class="distance">
-          📏 ${formatDistance(distance)}
-        </span>
-        &nbsp;
-        <span class="direction">
-          ${direction}
-        </span>`;
-
-    }
-
-  });
-
-
-  sortResultsByDistance();
-}
-
-
-/* =====================================================
-   تنسيق المسافة
-===================================================== */
-
-function formatDistance(distance) {
-
-  if (distance < 1) {
-
-    return Math.round(
-      distance * 1000
-    ) + " متر";
-
-  }
-
-  return distance.toFixed(2) + " كم";
-}
-
-
-/* =====================================================
-   ترتيب النتائج حسب القرب
-===================================================== */
-
-function sortResultsByDistance() {
-
-  if (!userLocation) {
-    return;
-  }
-
-  const container =
-    document.getElementById("results");
-
-  const items =
-    Array.from(
-      container.querySelectorAll(".result")
     );
 
-
-  items.sort(function(a, b) {
-
-    const distanceA =
-      calculateDistance(
-        userLocation.lat,
-        userLocation.lon,
-        parseFloat(a.dataset.lat),
-        parseFloat(a.dataset.lon)
-      );
-
-    const distanceB =
-      calculateDistance(
-        userLocation.lat,
-        userLocation.lon,
-        parseFloat(b.dataset.lat),
-        parseFloat(b.dataset.lon)
-      );
-
-    return distanceA - distanceB;
-
-  });
-
-
-  items.forEach(function(item, index) {
-
-    const title =
-      item.querySelector(".result-title");
-
-    if (title) {
-
-      const original =
-        title.dataset.originalName;
-
-      title.innerHTML =
-        `${index + 1}. ${escapeHTML(original)}`;
-
-    }
-
-    container.appendChild(item);
-
-  });
-}
-
-
-/* =====================================================
-   البحث الذكي
-===================================================== */
-
-async function smartSearch() {
-
-  const input =
-    document
-      .getElementById("searchInput")
-      .value
-      .trim();
-
-  const status =
-    document.getElementById("status");
-
-  const results =
-    document.getElementById("results");
-
-
-  if (!input) {
-
-    status.innerText =
-      "اكتب شيئاً للبحث 🔎";
-
-    return;
-  }
-
-
-  clearMarkers();
-
-  results.innerHTML = "";
-
-  status.innerText =
-    "🧠 جاري فهم طلبك...";
-
-
-  try {
-
-    const category =
-      findCategory(input);
-
-
-    /* ---------------------------------------------
-       بحث عن مكان عادي
-    --------------------------------------------- */
-
-    if (!category) {
-
-      const place =
-        await geocode(input);
-
-
-      if (!place) {
-
-        status.innerText =
-          "❌ لم أجد هذا المكان.";
-
-        return;
+    const terrain = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}",
+      {
+        maxZoom: 13,
+        attribution: "Tiles &copy; Esri"
       }
+    );
 
-
-      map.setView(
-        [place.lat, place.lon],
-        13
-      );
-
-
-      const marker =
-        L.marker([
-          place.lat,
-          place.lon
-        ]).addTo(map);
-
-
-      marker.bindPopup(
-        "<b>" +
-        escapeHTML(place.display) +
-        "</b>"
-      );
-
-
-      markers.push(marker);
-
-
-      status.innerText =
-        "📍 تم العثور على المكان.";
-
-      return;
-    }
-
-
-    /* ---------------------------------------------
-       استخراج اسم المنطقة
-    --------------------------------------------- */
-
-    let locationText = input;
-
-
-    for (
-      const wordList
-      of Object.values(categories)
-    ) {
-
-      wordList.forEach(function(word) {
-
-        const regex =
-          new RegExp(
-            word.replace(
-              /[.*+?^${}()|[\]\\]/g,
-              "\\$&"
-            ),
-            "gi"
-          );
-
-        locationText =
-          locationText.replace(
-            regex,
-            ""
-          );
-
-      });
-
-    }
-
-
-    locationText =
-      locationText
-        .replace(/\bفي\b/gi, "")
-        .replace(/\bحول\b/gi, "")
-        .replace(/\bnear\b/gi, "")
-        .replace(/\bin\b/gi, "")
-        .replace(/\bof\b/gi, "")
-        .replace(/\s+/g, " ")
-        .trim();
-
-
-    if (!locationText) {
-
-      status.innerText =
-        "⚠️ اكتب اسم المدينة أو المنطقة.";
-
-      return;
-    }
-
-
-    /* ---------------------------------------------
-       تحديد المدينة
-    --------------------------------------------- */
-
-    status.innerText =
-      "🌍 أبحث عن " +
-      locationText +
-      "...";
-
-
-    const place =
-      await geocode(locationText);
-
-
-    if (!place) {
-
-      status.innerText =
-        "❌ لم أجد المنطقة المطلوبة.";
-
-      return;
-    }
-
-
-    /* ---------------------------------------------
-       البحث عن الأماكن
-    --------------------------------------------- */
-
-    status.innerText =
-      "🔎 أبحث عن الأماكن الحقيقية...";
-
-
-    const tags =
-      getTags(category);
-
-
-    let elements =
-      await searchPlaces(
-        place.lat,
-        place.lon,
-        tags
-      );
-
-
-    /* ---------------------------------------------
-       إزالة التكرار
-    --------------------------------------------- */
-
-    const unique =
-      new Map();
-
-
-    elements.forEach(function(element) {
-
-      const name =
-        element.tags &&
-        element.tags.name
-          ? element.tags.name
-          : "مكان بدون اسم";
-
-
-      const lat =
-        element.lat !== undefined
-          ? element.lat
-          : element.center?.lat;
-
-
-      const lon =
-        element.lon !== undefined
-          ? element.lon
-          : element.center?.lon;
-
-
-      if (
-        lat !== undefined &&
-        lon !== undefined
-      ) {
-
-        const key =
-          name +
-          "|" +
-          lat +
-          "|" +
-          lon;
-
-
-        unique.set(
-          key,
-          {
-            name: name,
-            lat: lat,
-            lon: lon,
-            tags: element.tags || {}
-          }
-        );
-
-      }
-
+    const map = L.map("map", {
+      center: [31.95, 35.91],
+      zoom: 7,
+      layers: [street]
     });
 
+    const mapTypes = {
+      "🗺️ الشوارع": street,
+      "🛰️ القمر الصناعي": satellite,
+      "⛰️ التضاريس": terrain
+    };
 
-    elements =
-      Array.from(unique.values());
-
-
-    /* ---------------------------------------------
-       ترتيب أولي حسب موقع البحث
-    --------------------------------------------- */
-
-    elements.sort(function(a, b) {
-
-      const da =
-        calculateDistance(
-          place.lat,
-          place.lon,
-          a.lat,
-          a.lon
-        );
-
-      const db =
-        calculateDistance(
-          place.lat,
-          place.lon,
-          b.lat,
-          b.lon
-        );
-
-      return da - db;
-
-    });
+    L.control.layers(mapTypes, null, {
+      position: "topright"
+    }).addTo(map);
 
 
-    /* ---------------------------------------------
-       لا توجد نتائج
-    --------------------------------------------- */
+    /* =====================================================
+       VARIABLES
+    ===================================================== */
 
-    if (!elements.length) {
+    let markers = [];
+    let userLocation = null;
+    let userMarker = null;
+    let accuracyCircle = null;
+    let selectedArea = null;
 
-      status.innerText =
-        "😕 لم أجد نتائج قريبة.";
 
-      map.setView(
-        [place.lat, place.lon],
-        12
-      );
+    /* =====================================================
+       UI
+    ===================================================== */
 
-      return;
+    function showInfo(title, text) {
+
+      document.getElementById("infoCard").style.display = "block";
+
+      document.getElementById("infoTitle").innerText = title;
+
+      document.getElementById("infoText").innerText = text;
+
     }
 
 
-    /* ---------------------------------------------
-       عرض النتائج
-    --------------------------------------------- */
+    function closeInfo() {
 
-    const bounds = [];
+      document.getElementById("infoCard").style.display = "none";
 
-
-    elements.forEach(function(item, index) {
-
-      const marker =
-        L.marker([
-          item.lat,
-          item.lon
-        ]).addTo(map);
+    }
 
 
-      marker.bindPopup(
-        "<b>" +
-        escapeHTML(item.name) +
-        "</b><br><br>" +
-        "📍 " +
-        item.lat.toFixed(5) +
-        ", " +
-        item.lon.toFixed(5)
+    function clearMarkers() {
+
+      markers.forEach(marker => map.removeLayer(marker));
+
+      markers = [];
+
+    }
+
+
+    /* =====================================================
+       SEARCH
+    ===================================================== */
+
+    async function smartSearch() {
+
+      const input =
+        document.getElementById("searchInput").value.trim();
+
+      if (!input) return;
+
+      showInfo(
+        "🔎 TERRA X SEARCH",
+        "جاري تحليل طلبك..."
       );
 
+      document.getElementById("results").innerHTML = "";
 
-      markers.push(marker);
+      clearMarkers();
 
+      try {
 
-      bounds.push([
-        item.lat,
-        item.lon
-      ]);
+        const geoURL =
+          "https://nominatim.openstreetmap.org/search" +
+          "?format=jsonv2&limit=1&q=" +
+          encodeURIComponent(input);
 
+        const response =
+          await fetch(geoURL);
 
-      /* -------------------------------------------
-         النتيجة في القائمة
-      ------------------------------------------- */
+        const data =
+          await response.json();
 
-      const div =
-        document.createElement("div");
+        if (!data.length) {
 
-
-      div.className =
-        "result";
-
-
-      div.dataset.lat =
-        item.lat;
-
-      div.dataset.lon =
-        item.lon;
-
-
-      let distanceHTML =
-        `<span class="distanceInfo">
-          📍 موقع النتيجة
-        </span>`;
-
-
-      if (userLocation) {
-
-        const distance =
-          calculateDistance(
-            userLocation.lat,
-            userLocation.lon,
-            item.lat,
-            item.lon
+          showInfo(
+            "❌ لم نجد النتيجة",
+            "جرّب اسمًا آخر أو اكتب المدينة مع المكان."
           );
 
+          return;
 
-        const direction =
-          getDirection(
-            userLocation.lat,
-            userLocation.lon,
-            item.lat,
-            item.lon
-          );
+        }
 
+        const place = data[0];
 
-        distanceHTML =
-          `<span class="distanceInfo">
-            <span class="distance">
-              📏 ${formatDistance(distance)}
-            </span>
-            &nbsp;
-            <span class="direction">
-              ${direction}
-            </span>
-          </span>`;
+        const lat =
+          parseFloat(place.lat);
 
-      }
-
-
-      div.innerHTML = `
-
-        <div class="result-title">
-          ${index + 1}. ${escapeHTML(item.name)}
-        </div>
-
-        <div class="result-info">
-          📍 ${item.lat.toFixed(5)},
-          ${item.lon.toFixed(5)}
-        </div>
-
-        <div class="result-info">
-          ${distanceHTML}
-        </div>
-
-      `;
-
-
-      const title =
-        div.querySelector(".result-title");
-
-      title.dataset.originalName =
-        item.name;
-
-
-      /* -------------------------------------------
-         الضغط على النتيجة
-      ------------------------------------------- */
-
-      div.onclick = function() {
+        const lon =
+          parseFloat(place.lon);
 
         map.setView(
-          [item.lat, item.lon],
-          17
+          [lat, lon],
+          13
         );
 
-        marker.openPopup();
+        const marker =
+          L.marker([lat, lon])
+          .addTo(map);
 
-      };
+        marker.bindPopup(
+          `<b>${place.display_name}</b>`
+        ).openPopup();
 
+        markers.push(marker);
 
-      results.appendChild(div);
+        showInfo(
+          "📍 الموقع",
+          place.display_name
+        );
 
-    });
+      } catch (error) {
 
+        showInfo(
+          "⚠️ خطأ",
+          "تعذر الاتصال بخدمة البحث."
+        );
 
-    /* ---------------------------------------------
-       إذا كان لدينا موقع المستخدم
-    --------------------------------------------- */
-
-    if (userLocation) {
-
-      sortResultsByDistance();
+      }
 
     }
 
 
-    /* ---------------------------------------------
-       تكبير الخريطة
-    --------------------------------------------- */
+    /* =====================================================
+       MY LOCATION
+    ===================================================== */
 
-    if (bounds.length === 1) {
+    function getMyLocation() {
 
-      map.setView(
-        bounds[0],
-        15
+      if (!navigator.geolocation) {
+
+        showInfo(
+          "❌ غير متاح",
+          "جهازك لا يدعم تحديد الموقع."
+        );
+
+        return;
+
+      }
+
+      showInfo(
+        "📍 موقعي الآن",
+        "جاري تحديد موقعك..."
       );
 
-    } else {
+      navigator.geolocation.getCurrentPosition(
 
-      map.fitBounds(
-        bounds,
+        position => {
+
+          const lat =
+            position.coords.latitude;
+
+          const lon =
+            position.coords.longitude;
+
+          const accuracy =
+            position.coords.accuracy;
+
+          userLocation =
+            [lat, lon];
+
+          if (userMarker)
+            map.removeLayer(userMarker);
+
+          if (accuracyCircle)
+            map.removeLayer(accuracyCircle);
+
+          userMarker =
+            L.marker(userLocation)
+            .addTo(map)
+            .bindPopup("📍 موقعك الحالي")
+            .openPopup();
+
+          accuracyCircle =
+            L.circle(
+              userLocation,
+              {
+                radius: accuracy
+              }
+            ).addTo(map);
+
+          map.setView(
+            userLocation,
+            15
+          );
+
+          showInfo(
+            "📍 موقعك",
+            "تم تحديد موقعك بنجاح."
+          );
+
+        },
+
+        error => {
+
+          showInfo(
+            "⚠️ تعذر تحديد الموقع",
+            "تأكد من السماح للتطبيق باستخدام الموقع."
+          );
+
+        },
+
         {
-          padding: [40, 40]
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+
+      );
+
+    }
+
+
+    /* =====================================================
+       POPULATION AI
+    ===================================================== */
+
+    function populationAI() {
+
+      showInfo(
+        "👥 POPULATION AI",
+        "حدد منطقة على الخريطة لتحليل السكان."
+      );
+
+      document.getElementById("results").innerHTML = `
+
+        <div class="result">
+          👥 تقدير السكان
+          <small>
+            سيتم حسابه من بيانات سكانية حقيقية
+            عند ربط مصدر البيانات.
+          </small>
+        </div>
+
+        <div class="result">
+          🏠 المباني
+          <small>
+            تحليل الكثافة العمرانية
+          </small>
+        </div>
+
+        <div class="result">
+          📊 الكثافة
+          <small>
+            عدد السكان بالنسبة للمساحة
+          </small>
+        </div>
+
+      `;
+
+    }
+
+
+    /* =====================================================
+       SATELLITE COMPARE
+    ===================================================== */
+
+    function satelliteCompare() {
+
+      showInfo(
+        "🛰️ SATELLITE COMPARE",
+        "ميزة مقارنة صور الأقمار الصناعية قيد البناء."
+      );
+
+      document.getElementById("results").innerHTML = `
+
+        <div class="result">
+          🔄 مقارنة زمنية
+          <small>
+            قبل ← بعد
+          </small>
+        </div>
+
+        <div class="result">
+          📅 السنوات
+          <small>
+            سيتم عرض السنوات المتاحة للموقع.
+          </small>
+        </div>
+
+        <div class="result">
+          🔍 تحليل التغير
+          <small>
+            عمران • نباتات • تغيرات سطحية
+          </small>
+        </div>
+
+      `;
+
+    }
+
+
+    /* =====================================================
+       ANALYSIS
+    ===================================================== */
+
+    function analysisMode() {
+
+      showInfo(
+        "📊 TERRA X ANALYSIS",
+        "اختر منطقة لبدء التحليل الجغرافي."
+      );
+
+      document.getElementById("results").innerHTML = `
+
+        <div class="result">
+          🏙️ العمران
+          <small>
+            تحليل المناطق المبنية
+          </small>
+        </div>
+
+        <div class="result">
+          🌳 الغطاء النباتي
+          <small>
+            تحليل المساحات الخضراء
+          </small>
+        </div>
+
+        <div class="result">
+          🛣️ الطرق
+          <small>
+            تحليل شبكة الطرق
+          </small>
+        </div>
+
+        <div class="result">
+          🏠 المباني
+          <small>
+            تحليل المباني والمناطق السكنية
+          </small>
+        </div>
+
+      `;
+
+    }
+
+
+    /* =====================================================
+       AREA SELECTION
+    ===================================================== */
+
+    function drawMode() {
+
+      showInfo(
+        "✏️ تحديد منطقة",
+        "اضغط على نقطتين أو أكثر على الخريطة لإنشاء منطقة."
+      );
+
+      alert(
+        "ميزة الرسم المتقدم سنضيفها في الخطوة التالية 🔥"
+      );
+
+    }
+
+
+    /* =====================================================
+       ENTER KEY
+    ===================================================== */
+
+    document
+      .getElementById("searchInput")
+      .addEventListener(
+        "keydown",
+        function(event) {
+
+          if (event.key === "Enter") {
+
+            smartSearch();
+
+          }
+
         }
       );
 
-    }
-
-
-    status.innerText =
-      "✅ وجدت " +
-      elements.length +
-      " نتيجة حقيقية حول " +
-      locationText;
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    status.innerText =
-      "❌ حدث خطأ أثناء البحث. حاول مرة أخرى.";
-
-  }
-
-}
-
-
-/* =====================================================
-   الأمثلة
-===================================================== */
-
-function setSearch(text) {
-
-  document
-    .getElementById("searchInput")
-    .value = text;
-
-  smartSearch();
-
-}
-
-
-/* =====================================================
-   Enter
-===================================================== */
-
-document
-  .getElementById("searchInput")
-  .addEventListener(
-    "keydown",
-    function(event) {
-
-      if (event.key === "Enter") {
-        smartSearch();
-      }
-
-    }
-  );
-
-</script>
+  </script>
 
 </body>
-  </html>
+</html>
