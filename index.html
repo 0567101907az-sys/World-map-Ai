@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>WORLD MAP AI</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #10141c;
+    color: white;
+}
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    padding: 18px;
+    text-align: center;
+    background: #171d27;
+    border-bottom: 1px solid #293241;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.subtitle {
+    margin-top: 5px;
+    color: #aeb8c7;
+    font-size: 14px;
+}
+
+/* =========================
+   AI SEARCH
+========================= */
+
+.ai-box {
+    padding: 15px;
+    background: #121822;
+}
+
+.search-container {
+    display: flex;
+    gap: 8px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #344052;
+    background: #1b2330;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-button {
+    width: 55px;
+    border: none;
+    border-radius: 12px;
+    background: #2563eb;
+    color: white;
+    font-size: 20px;
+}
+
+/* =========================
+   CATEGORIES
+========================= */
+
+.categories {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 10px 15px;
+}
+
+.category {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    border-radius: 20px;
+    background: #1b2330;
+    border: 1px solid #344052;
+    color: white;
+    font-size: 13px;
+}
+
+/* =========================
+   MAP
+========================= */
+
+.map {
+    flex: 1;
+    min-height: 420px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            rgba(20,30,40,0.85),
+            rgba(20,30,40,0.85)
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 39px,
+            #263241 40px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 39px,
+            #263241 40px
+        );
+}
+
+.map-content {
+    text-align: center;
+    color: #aeb8c7;
+}
+
+.map-icon {
+    font-size: 70px;
+    margin-bottom: 10px;
+}
+
+/* =========================
+   AI PANEL
+========================= */
+
+.ai-panel {
+    padding: 15px;
+    background: #171d27;
+    border-top: 1px solid #293241;
+}
+
+.ai-title {
+    font-size: 17px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.ai-description {
+    color: #aeb8c7;
+    font-size: 14px;
+}
+
+/* =========================
+   LANGUAGE
+========================= */
+
+.language {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.language button {
+    padding: 8px 15px;
+    border-radius: 15px;
+    border: 1px solid #344052;
+    background: #1b2330;
+    color: white;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="logo">
+            🌍 WORLD MAP AI
+        </div>
+
+        <div class="subtitle">
+            مساعدك الجغرافي الذكي
+        </div>
+
+    </div>
+
+
+    <!-- AI SEARCH -->
+
+    <div class="ai-box">
+
+        <div class="search-container">
+
+            <input
+                id="searchInput"
+                class="search-input"
+                type="text"
+                placeholder="🔎 اسأل عن أي مكان..."
+            >
+
+            <button
+                class="search-button"
+                onclick="searchPlace()"
+            >
+                🔍
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- CATEGORIES -->
+
+    <div class="categories">
+
+        <button class="category">
+            📍 الكل
+        </button>
+
+        <button class="category">
+            🏫 مدارس
+        </button>
+
+        <button class="category">
+            🏥 مستشفيات
+        </button>
+
+        <button class="category">
+            🕌 مساجد
+        </button>
+
+        <button class="category">
+            🎓 جامعات
+        </button>
+
+        <button class="category">
+            🏟️ ملاعب
+        </button>
+
+    </div>
+
+
+    <!-- MAP -->
+
+    <div class="map">
+
+        <div class="map-content">
+
+            <div class="map-icon">
+                🗺️
+            </div>
+
+            <div>
+                الخريطة ستظهر هنا
+            </div>
+
+            <div style="font-size:12px;margin-top:5px;">
+                Your map will appear here
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- AI PANEL -->
+
+    <div class="ai-panel">
+
+        <div class="ai-title">
+            🤖 WORLD MAP AI
+        </div>
+
+        <div
+            id="aiMessage"
+            class="ai-description"
+        >
+            اسألني عن أي مكان في العالم...
+        </div>
+
+
+        <div class="language">
+
+            <button onclick="changeLanguage()">
+                🇵🇸 العربية / 🇬🇧 English
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let language = "ar";
+
+
+function searchPlace() {
+
+    const input =
+        document.getElementById("searchInput");
+
+    const message =
+        document.getElementById("aiMessage");
+
+    const place =
+        input.value.trim();
+
+
+    if (!place) {
+
+        message.innerText =
+            language === "ar"
+            ? "❌ اكتب اسم مكان أولاً."
+            : "❌ Enter a place first.";
+
+        return;
+    }
+
+
+    message.innerText =
+        language === "ar"
+        ? "🔎 جاري البحث عن: " + place
+        : "🔎 Searching for: " + place;
+
+}
+
+
+function changeLanguage() {
+
+    language =
+        language === "ar"
+        ? "en"
+        : "ar";
+
+
+    const input =
+        document.getElementById("searchInput");
+
+    const message =
+        document.getElementById("aiMessage");
+
+
+    if (language === "en") {
+
+        document.documentElement.lang = "en";
+
+        document.documentElement.dir = "ltr";
+
+        input.placeholder =
+            "🔎 Ask about any place...";
+
+        message.innerText =
+            "Ask me about any place in the world.";
+
+    } else {
+
+        document.documentElement.lang = "ar";
+
+        document.documentElement.dir = "rtl";
+
+        input.placeholder =
+            "🔎 اسأل عن أي مكان...";
+
+        message.innerText =
+            "اسألني عن أي مكان في العالم...";
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>
