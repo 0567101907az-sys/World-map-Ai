@@ -2,604 +2,557 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>TERRA X 7.0</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>TERRA X 7.1</title>
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;font-family:Arial,sans-serif;background:#05070b;color:#eaf2ff;overflow:hidden}
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+  background:#05070b;
+  color:#fff
+}
 button,input{font:inherit}
 button{cursor:pointer}
 
-#app{height:100%;position:relative}
+#app{
+  width:100%;
+  height:100%;
+  position:relative;
+  overflow:hidden
+}
+
+.screen{
+  position:absolute;
+  inset:0;
+  display:none
+}
+.screen.active{display:block}
+
+#mapScreen{background:#05070b}
 
 #map{
-position:absolute;
-inset:0;
-z-index:1;
+  position:absolute;
+  inset:0
 }
 
 .leaflet-control-attribution{
-font-size:9px!important;
-background:rgba(0,0,0,.65)!important;
-color:#aaa!important
+  font-size:9px!important
 }
 
-.top{
-position:absolute;
-top:0;
-left:0;
-right:0;
-z-index:1000;
-padding:10px;
-display:flex;
-gap:8px;
-align-items:center;
-background:linear-gradient(180deg,rgba(3,6,12,.96),rgba(3,6,12,.65),transparent)
+.topbar{
+  position:absolute;
+  z-index:1000;
+  top:10px;
+  left:10px;
+  right:10px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+  direction:ltr
 }
 
 .logo{
-font-size:18px;
-font-weight:900;
-letter-spacing:2px;
-white-space:nowrap;
-color:#8ed8ff;
-text-shadow:0 0 15px #1595d5
+  min-width:100px;
+  padding:11px 13px;
+  border-radius:14px;
+  background:rgba(4,8,14,.9);
+  border:1px solid rgba(0,220,255,.35);
+  box-shadow:0 0 20px rgba(0,200,255,.12);
+  font-weight:900;
+  letter-spacing:2px;
+  color:#7deaff
 }
 
-.search{
-flex:1;
-display:flex;
-gap:6px
+.searchBox{
+  flex:1;
+  display:flex;
+  gap:6px
 }
 
-.search input{
-width:100%;
-background:rgba(10,18,30,.92);
-border:1px solid #24445c;
-border-radius:12px;
-padding:11px;
-color:white;
-outline:none
+.searchBox input{
+  min-width:0;
+  flex:1;
+  border:1px solid rgba(255,255,255,.14);
+  outline:none;
+  border-radius:13px;
+  background:rgba(5,10,17,.92);
+  color:#fff;
+  padding:11px 13px
 }
 
 .btn{
-border:1px solid #24506b;
-background:rgba(8,17,28,.94);
-color:#dff4ff;
-padding:10px 12px;
-border-radius:11px;
-font-weight:bold
+  border:1px solid rgba(0,220,255,.25);
+  color:#dffaff;
+  background:rgba(6,14,23,.92);
+  border-radius:12px;
+  padding:10px 12px;
+  transition:.2s
+}
+.btn:active{transform:scale(.96)}
+.btn.primary{
+  background:linear-gradient(135deg,#006b83,#004252);
+  border-color:#16d8ff
+}
+.btn.danger{
+  border-color:rgba(255,70,70,.4)
 }
 
-.btn:hover{background:#102638}
-
-#searchBtn{
-background:#0c75a8;
-border-color:#25a9e8
+.mapControls{
+  position:absolute;
+  z-index:1000;
+  top:67px;
+  left:10px;
+  display:flex;
+  gap:6px;
+  direction:ltr;
+  flex-wrap:wrap
 }
 
-.layers{
-position:absolute;
-top:65px;
-left:10px;
-z-index:1000;
-display:flex;
-gap:6px
+.bottomPanel{
+  position:absolute;
+  z-index:1000;
+  bottom:10px;
+  left:10px;
+  right:10px;
+  background:rgba(4,8,14,.94);
+  border:1px solid rgba(0,220,255,.2);
+  border-radius:18px;
+  padding:10px;
+  max-height:38vh;
+  overflow:auto;
+  backdrop-filter:blur(10px)
 }
 
-.layerBtn{
-background:rgba(4,10,17,.9);
-color:#b9dfff;
-border:1px solid #24445c;
-border-radius:9px;
-padding:7px 9px;
-font-size:11px
+.panelTitle{
+  color:#71e8ff;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:8px
 }
 
-.layerBtn.active{
-background:#0d6f9c;
-color:white
+.chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px
 }
 
-.bottom{
-position:absolute;
-bottom:0;
-left:0;
-right:0;
-z-index:1000;
-padding:10px;
-background:linear-gradient(transparent,rgba(3,6,12,.98) 30%)
-}
-
-.panel{
-background:rgba(6,12,20,.95);
-border:1px solid #1c3c52;
-border-radius:16px;
-box-shadow:0 0 25px rgba(0,0,0,.4);
-backdrop-filter:blur(10px)
-}
-
-.controls{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:7px;
-padding:8px
-}
-
-.control{
-padding:9px 5px;
-border:1px solid #1d3b4f;
-border-radius:10px;
-background:#09131e;
-color:#bde8ff;
-font-size:11px
-}
-
-.control:hover{background:#102638}
-
-.results{
-max-height:145px;
-overflow:auto;
-padding:5px
+.chip{
+  padding:8px 10px;
+  border-radius:10px;
+  background:#0b141e;
+  border:1px solid #203442;
+  color:#d8f9ff;
+  font-size:12px
 }
 
 .result{
-padding:9px;
-border-bottom:1px solid #183143;
-font-size:12px
+  padding:9px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+  cursor:pointer
 }
+.result:last-child{border-bottom:0}
+.result strong{display:block}
+.result small{color:#9bb0bc}
 
-.result strong{color:#8fdcff}
-.result small{display:block;color:#8399aa;margin-top:3px}
-
-#intel{
-position:absolute;
-inset:0;
-z-index:2000;
-display:none;
-background:#04070c;
-overflow:auto
-}
-
-.intelHead{
-position:sticky;
-top:0;
-z-index:10;
-padding:12px;
-background:rgba(4,8,14,.97);
-border-bottom:1px solid #173448;
-display:flex;
-align-items:center;
-justify-content:space-between
-}
-
-.intelTitle{
-font-size:18px;
-font-weight:900;
-letter-spacing:2px;
-color:#8ed8ff
-}
-
-.intelBody{
-padding:10px;
-max-width:1100px;
-margin:auto
-}
-
-.target{
-padding:13px;
-margin-bottom:10px
-}
-
-.targetTitle{
-font-size:12px;
-color:#6e9db9;
-text-transform:uppercase;
-letter-spacing:1px
-}
-
-.targetName{
-font-size:20px;
-font-weight:bold;
-margin-top:4px
-}
-
-.cards{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:8px
-}
-
-.card{
-background:#08111b;
-border:1px solid #18384d;
-border-radius:14px;
-padding:12px;
-min-height:92px
-}
-
-.card .label{
-font-size:10px;
-color:#6f94aa;
-text-transform:uppercase
-}
-
-.card .value{
-font-size:22px;
-font-weight:900;
-margin-top:7px;
-color:#dff5ff
-}
-
-.card .sub{
-font-size:10px;
-color:#7990a0;
-margin-top:5px
-}
-
-.section{
-margin-top:10px;
-padding:12px
-}
-
-.section h3{
-margin:0 0 9px;
-font-size:13px;
-color:#9cdcff
-}
-
-.row{
-display:flex;
-justify-content:space-between;
-gap:10px;
-padding:8px 0;
-border-bottom:1px solid #142a39;
-font-size:12px
-}
-
-.row:last-child{border-bottom:0}
-
-.source{
-font-size:9px;
-color:#668397;
-margin-top:8px
-}
-
-.status{
-display:inline-block;
-padding:3px 6px;
-border-radius:6px;
-background:#102c3c;
-color:#7dd6ff;
-font-size:9px
-}
-
-.good{color:#76e6a7}
-.warn{color:#ffd37d}
-.bad{color:#ff8b8b}
-
-.ask{
-display:flex;
-gap:6px
-}
-
-.ask input{
-flex:1;
-background:#050b12;
-border:1px solid #24445c;
-color:white;
-padding:11px;
-border-radius:10px;
-outline:none
-}
-
-.ask button{
-background:#0b75a8;
-border:0;
-color:white;
-border-radius:10px;
-padding:0 14px;
-font-weight:bold
-}
-
-.commandExamples{
-display:flex;
-gap:5px;
-overflow:auto;
-margin-top:8px
-}
-
-.cmd{
-white-space:nowrap;
-font-size:10px;
-padding:6px 8px;
-border-radius:8px;
-background:#0b1723;
-border:1px solid #1b394d;
-color:#9bdcff
+#intelScreen{
+  background:#03060a
 }
 
 #intelMap{
-height:260px;
-border-radius:14px;
-overflow:hidden;
-border:1px solid #1c3d52
+  position:absolute;
+  inset:0
 }
 
-.progress{
-height:5px;
-background:#0c1822;
-border-radius:10px;
-overflow:hidden;
-margin-top:8px
+.intelOverlay{
+  position:absolute;
+  inset:0;
+  z-index:1100;
+  pointer-events:none
 }
 
-.progress i{
-display:block;
-height:100%;
-width:0;
-background:#20a8e8;
-transition:width .3s
+.intelHeader{
+  pointer-events:auto;
+  position:absolute;
+  top:10px;
+  left:10px;
+  right:10px;
+  padding:10px;
+  border:1px solid rgba(0,220,255,.28);
+  background:rgba(3,8,14,.91);
+  border-radius:16px;
+  backdrop-filter:blur(12px)
 }
 
-.event{
-padding:9px;
-border-bottom:1px solid #172d3c;
-font-size:11px
+.intelHeaderRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px
 }
 
-.event b{color:#9bdeff}
-.event small{
-display:block;
-color:#71899a;
-margin-top:3px
+.intelTitle{
+  color:#7deaff;
+  font-weight:900;
+  letter-spacing:1.5px
 }
 
-.empty{
-color:#71899a;
-font-size:11px;
-padding:10px 0
+.targetBadge{
+  color:#a7bac5;
+  font-size:10px;
+  margin-top:4px
 }
 
-.report{
-white-space:pre-wrap;
-font-family:Arial,sans-serif;
-font-size:11px;
-line-height:1.7;
-background:#050a10;
-padding:10px;
-border-radius:10px;
-border:1px solid #173448
+.intelTools{
+  pointer-events:auto;
+  position:absolute;
+  top:100px;
+  left:10px;
+  right:10px;
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:3px;
+  direction:rtl
+}
+
+.toolBtn{
+  white-space:nowrap;
+  border:1px solid rgba(0,220,255,.28);
+  background:rgba(4,11,18,.94);
+  color:#dffaff;
+  border-radius:12px;
+  padding:9px 11px;
+  font-size:12px
+}
+.toolBtn.active{
+  background:#06485a;
+  border-color:#17d9ff;
+  box-shadow:0 0 14px rgba(0,220,255,.2)
+}
+
+.radiusMenu{
+  pointer-events:auto;
+  position:absolute;
+  top:150px;
+  right:10px;
+  display:none;
+  flex-direction:column;
+  gap:5px;
+  padding:7px;
+  border:1px solid rgba(0,220,255,.3);
+  background:rgba(3,9,15,.96);
+  border-radius:13px
+}
+.radiusMenu.show{display:flex}
+.radiusMenu button{
+  border:1px solid #213946;
+  background:#09131b;
+  color:white;
+  border-radius:9px;
+  padding:7px 12px
+}
+
+.intelStats{
+  pointer-events:auto;
+  position:absolute;
+  bottom:120px;
+  left:10px;
+  right:10px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:7px
+}
+
+.stat{
+  padding:11px;
+  border-radius:14px;
+  border:1px solid rgba(0,220,255,.18);
+  background:rgba(3,9,15,.91);
+  backdrop-filter:blur(10px)
+}
+
+.statLabel{
+  font-size:10px;
+  color:#8da3ae
+}
+.statValue{
+  margin-top:5px;
+  font-size:18px;
+  font-weight:900;
+  color:#e8fbff
+}
+
+.intelBottom{
+  pointer-events:auto;
+  position:absolute;
+  bottom:10px;
+  left:10px;
+  right:10px;
+  max-height:100px;
+  overflow:auto;
+  padding:10px;
+  border-radius:15px;
+  border:1px solid rgba(0,220,255,.2);
+  background:rgba(3,8,14,.94);
+  font-size:11px;
+  color:#c8d8df
+}
+
+.selectionHint{
+  pointer-events:none;
+  position:absolute;
+  z-index:1200;
+  top:200px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:9px 13px;
+  border-radius:12px;
+  background:rgba(0,0,0,.75);
+  border:1px solid rgba(0,220,255,.35);
+  color:#bfefff;
+  font-size:11px;
+  display:none
+}
+.selectionHint.show{display:block}
+
+#toast{
+  position:absolute;
+  z-index:5000;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%) translateY(20px);
+  opacity:0;
+  pointer-events:none;
+  background:#07121a;
+  border:1px solid #13cfee;
+  border-radius:13px;
+  padding:10px 14px;
+  font-size:12px;
+  transition:.25s;
+  white-space:nowrap;
+  max-width:90vw;
+  overflow:hidden;
+  text-overflow:ellipsis
+}
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0)
+}
+
+.loading{
+  color:#7deaff;
+  padding:10px 0
+}
+
+.reportBox{
+  white-space:pre-wrap;
+  line-height:1.7;
+  font-size:11px;
+  color:#d5e7ed
 }
 
 @media(min-width:700px){
-.cards{grid-template-columns:repeat(4,1fr)}
-#intelMap{height:380px}
+  .intelStats{
+    grid-template-columns:repeat(4,1fr)
+  }
+  .bottomPanel{
+    max-width:500px
+  }
 }
 </style>
 </head>
 
 <body>
-
 <div id="app">
 
-<div id="map"></div>
+  <!-- ================= MAIN MAP ================= -->
+  <section id="mapScreen" class="screen active">
 
-<div class="top">
-  <div class="logo">TERRA X</div>
+    <div id="map"></div>
 
-  <div class="search">
-    <input id="searchInput"
-      placeholder="ابحث عن مدينة، دولة، مكان...">
-    <button class="btn" id="searchBtn">⌕</button>
-  </div>
+    <div class="topbar">
+      <div class="logo">TERRA X</div>
 
-  <button class="btn" id="gpsBtn">◎</button>
-</div>
-
-<div class="layers">
-  <button class="layerBtn active" data-layer="street">STREET</button>
-  <button class="layerBtn" data-layer="satellite">SAT</button>
-  <button class="layerBtn" data-layer="terrain">TERRAIN</button>
-</div>
-
-<div class="bottom">
-  <div class="panel">
-    <div class="controls">
-      <button class="control" onclick="runSearchType('hospital')">🏥 مستشفيات</button>
-      <button class="control" onclick="runSearchType('school')">🏫 مدارس</button>
-      <button class="control" onclick="runSearchType('university')">🎓 جامعات</button>
-      <button class="control" onclick="runSearchType('restaurant')">🍽 مطاعم</button>
-
-      <button class="control" onclick="openIntel()">🧠 INTELLIGENCE</button>
-      <button class="control" onclick="drawMode()">✏️ رسم</button>
-      <button class="control" onclick="distanceMode()">📏 مسافة</button>
-      <button class="control" onclick="clearMapData()">✕ مسح</button>
-    </div>
-
-    <div id="results" class="results"></div>
-  </div>
-</div>
-
-
-<!-- INTELLIGENCE SCREEN -->
-
-<div id="intel">
-
-  <div class="intelHead">
-    <div class="intelTitle">TERRA X // INTELLIGENCE</div>
-    <button class="btn" onclick="closeIntel()">← MAP</button>
-  </div>
-
-  <div class="intelBody">
-
-    <div class="panel target">
-      <div class="targetTitle">CURRENT TARGET</div>
-      <div class="targetName" id="targetName">No target selected</div>
-      <div id="targetCoords" class="source">حدد مكانًا على الخريطة أو استخدم البحث</div>
-    </div>
-
-    <div class="panel section">
-      <h3>🤖 ASK TERRA</h3>
-
-      <div class="ask">
-        <input id="askInput"
-          placeholder="مثال: حلل المنطقة / كم مبنى / الأحداث الطبيعية">
-        <button onclick="askTerra()">ASK</button>
-      </div>
-
-      <div class="commandExamples">
-        <button class="cmd" onclick="setAsk('حلل المنطقة')">حلل المنطقة</button>
-        <button class="cmd" onclick="setAsk('كم مبنى؟')">كم مبنى؟</button>
-        <button class="cmd" onclick="setAsk('الأحداث الطبيعية')">الأحداث</button>
-        <button class="cmd" onclick="setAsk('بيانات الدولة')">الدولة</button>
-        <button class="cmd" onclick="setAsk('اعمل تقرير')">تقرير</button>
-        <button class="cmd" onclick="setAsk('قارن التغير')">التغير</button>
-      </div>
-
-      <div class="source" id="askStatus">
-        جاهز لاستقبال أوامرك.
+      <div class="searchBox">
+        <input id="searchInput" placeholder="ابحث عن مدينة، مكان، دولة..." />
+        <button class="btn primary" onclick="searchPlace()">بحث</button>
       </div>
     </div>
 
-    <div class="cards">
-
-      <div class="card">
-        <div class="label">BUILDINGS</div>
-        <div class="value" id="buildingValue">—</div>
-        <div class="sub" id="buildingSub">OSM / Overpass</div>
-      </div>
-
-      <div class="card">
-        <div class="label">COUNTRY</div>
-        <div class="value" id="countryValue">—</div>
-        <div class="sub" id="countrySub">Reverse geocoding</div>
-      </div>
-
-      <div class="card">
-        <div class="label">POPULATION</div>
-        <div class="value" id="populationValue">—</div>
-        <div class="sub" id="populationSub">World Bank</div>
-      </div>
-
-      <div class="card">
-        <div class="label">OPEN EVENTS</div>
-        <div class="value" id="eventValue">—</div>
-        <div class="sub">NASA EONET</div>
-      </div>
-
+    <div class="mapControls">
+      <button class="btn" onclick="setBase('street')">🗺️ Street</button>
+      <button class="btn" onclick="setBase('satellite')">🛰️ Satellite</button>
+      <button class="btn" onclick="setBase('terrain')">⛰️ Terrain</button>
+      <button class="btn" onclick="locateUser()">📍 GPS</button>
+      <button class="btn primary" onclick="openIntel()">🧠 INTELLIGENCE</button>
     </div>
 
-    <div class="panel section">
-      <h3>🗺️ GEO TARGET</h3>
-      <div id="intelMap"></div>
-    </div>
+    <div class="bottomPanel">
+      <div class="panelTitle">QUICK SEARCH</div>
 
-    <div class="panel section">
-      <h3>🧠 DATA FUSION</h3>
-      <div id="fusionData">
-        <div class="empty">حدد Target لبدء دمج البيانات.</div>
+      <div class="chips">
+        <button class="chip" onclick="quickSearch('مستشفيات')">🏥 مستشفيات</button>
+        <button class="chip" onclick="quickSearch('مدارس')">🏫 مدارس</button>
+        <button class="chip" onclick="quickSearch('جامعات')">🎓 جامعات</button>
+        <button class="chip" onclick="quickSearch('صيدليات')">💊 صيدليات</button>
+        <button class="chip" onclick="quickSearch('مطاعم')">🍽️ مطاعم</button>
+        <button class="chip" onclick="quickSearch('فنادق')">🏨 فنادق</button>
+        <button class="chip" onclick="quickSearch('مساجد')">🕌 مساجد</button>
       </div>
+
+      <div id="results"></div>
     </div>
+  </section>
 
-    <div class="panel section">
-      <h3>🔄 CHANGE INTELLIGENCE</h3>
+  <!-- ================= INTELLIGENCE ================= -->
+  <section id="intelScreen" class="screen">
 
-      <div id="changeData">
-        <div class="empty">
-          TERRA X سيحفظ القياسات الفعلية محليًا.
-          عند إعادة الفحص لاحقًا سيتم حساب التغير بين القياسات.
+    <div id="intelMap"></div>
+
+    <div class="intelOverlay">
+
+      <div class="intelHeader">
+        <div class="intelHeaderRow">
+          <div>
+            <div class="intelTitle">TERRA X // INTELLIGENCE</div>
+            <div class="targetBadge" id="targetBadge">
+              TARGET: لا يوجد هدف
+            </div>
+          </div>
+
+          <button class="btn danger" onclick="closeIntel()">← الخريطة</button>
         </div>
       </div>
 
-      <button class="btn" onclick="saveSnapshot()" style="margin-top:8px;width:100%">
-        💾 SAVE CURRENT SNAPSHOT
-      </button>
+      <!-- SMART TARGET TOOLBAR -->
+      <div class="intelTools">
+
+        <button id="pointTool"
+                class="toolBtn"
+                onclick="startPointMode()">
+          📍 نقطة
+        </button>
+
+        <button id="areaTool"
+                class="toolBtn"
+                onclick="startAreaMode()">
+          🔷 منطقة
+        </button>
+
+        <button id="radiusTool"
+                class="toolBtn"
+                onclick="toggleRadiusMenu()">
+          ⭕ نصف قطر
+        </button>
+
+        <button class="toolBtn" onclick="undoAreaPoint()">
+          ↶ تراجع
+        </button>
+
+        <button class="toolBtn" onclick="finishArea()">
+          ✓ إنهاء
+        </button>
+
+        <button class="toolBtn" onclick="cancelSelection()">
+          ✕ إلغاء
+        </button>
+
+        <button class="toolBtn" onclick="analyzeTarget()">
+          🧠 تحليل
+        </button>
+
+        <button class="toolBtn" onclick="saveSnapshot()">
+          💾 Snapshot
+        </button>
+
+      </div>
+
+      <div id="radiusMenu" class="radiusMenu">
+        <button onclick="startRadiusMode(500)">500 m</button>
+        <button onclick="startRadiusMode(1000)">1 km</button>
+        <button onclick="startRadiusMode(2000)">2 km</button>
+        <button onclick="startRadiusMode(5000)">5 km</button>
+      </div>
+
+      <div id="selectionHint" class="selectionHint"></div>
+
+      <div class="intelStats">
+
+        <div class="stat">
+          <div class="statLabel">TARGET TYPE</div>
+          <div class="statValue" id="statType">—</div>
+        </div>
+
+        <div class="stat">
+          <div class="statLabel">AREA</div>
+          <div class="statValue" id="statArea">—</div>
+        </div>
+
+        <div class="stat">
+          <div class="statLabel">BUILDINGS</div>
+          <div class="statValue" id="statBuildings">—</div>
+        </div>
+
+        <div class="stat">
+          <div class="statLabel">EVENTS</div>
+          <div class="statValue" id="statEvents">—</div>
+        </div>
+
+      </div>
+
+      <div class="intelBottom" id="intelLog">
+        TERRA X جاهز. اختر نقطة أو ارسم منطقة.
+      </div>
+
     </div>
+  </section>
 
-    <div class="panel section">
-      <h3>🌋 EARTH EVENTS</h3>
-      <div id="eventsData">
-        <div class="empty">لم يتم تحميل الأحداث بعد.</div>
-      </div>
-    </div>
-
-    <div class="panel section">
-      <h3>📊 ANALYSIS</h3>
-
-      <div id="analysisText" class="empty">
-        جاهز.
-      </div>
-
-      <div class="progress">
-        <i id="progressBar"></i>
-      </div>
-    </div>
-
-    <div class="panel section">
-      <h3>📄 ONE-CLICK REPORT</h3>
-
-      <button class="btn" onclick="generateReport()" style="width:100%">
-        GENERATE INTELLIGENCE REPORT
-      </button>
-
-      <div id="reportBox" style="margin-top:9px"></div>
-    </div>
-
-    <div class="panel section">
-      <h3>ℹ️ DATA SOURCES</h3>
-
-      <div class="row">
-        <span>OpenStreetMap</span>
-        <span class="status">GEO DATA</span>
-      </div>
-
-      <div class="row">
-        <span>NASA EONET</span>
-        <span class="status">EARTH EVENTS</span>
-      </div>
-
-      <div class="row">
-        <span>World Bank</span>
-        <span class="status">COUNTRY DATA</span>
-      </div>
-
-      <div class="row">
-        <span>Esri</span>
-        <span class="status">SATELLITE</span>
-      </div>
-
-      <div class="source">
-        TERRA X لا يعتبر غياب البيانات دليلًا على عدم وجود الظاهرة.
-        كل نتيجة مرتبطة بالمصدر المتاح وتاريخ البيانات.
-      </div>
-    </div>
-
-  </div>
+  <div id="toast"></div>
 </div>
-
-</div>
-
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-
 /* =========================================================
-   TERRA X 7.0
-   DATA FUSION + CHANGE INTELLIGENCE + ASK TERRA
-========================================================= */
+   TERRA X 7.1
+   SMART TARGET ENGINE
+   ========================================================= */
 
+let map;
+let intelMap;
 
-/* ---------- MAP ---------- */
+let currentBase = null;
 
-const map = L.map("map",{zoomControl:false}).setView([31.95,35.91],8);
+let target = null;
+let targetMarker = null;
 
-L.control.zoom({position:"bottomright"}).addTo(map);
+let intelTargetMarker = null;
+
+let targetMode = null;
+let radiusMeters = null;
+
+let areaPoints = [];
+let areaLayer = null;
+let radiusLayer = null;
+
+let buildingLayer = null;
+let eventLayer = null;
+
+let currentArea = null;
+let currentRadius = null;
+
+let userMarker = null;
+let userCircle = null;
+
+let searchMarkers = [];
 
 const street = L.tileLayer(
   "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -625,134 +578,66 @@ const terrain = L.tileLayer(
   }
 );
 
-street.addTo(map);
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
 
-let currentLayer = "street";
-let targetMarker = null;
-let userMarker = null;
-let eventLayer = null;
-let drawLayer = L.layerGroup().addTo(map);
-let target = null;
-let lastBuildingCount = null;
-let lastCountryData = null;
-let lastEvents = [];
-let lastAnalysis = null;
+document.addEventListener("DOMContentLoaded", () => {
 
+  map = L.map("map", {
+    zoomControl:true
+  }).setView([31.95,35.91],8);
 
-/* ---------- INTELLIGENCE MAP ---------- */
+  street.addTo(map);
+  currentBase = street;
 
-let intelMap = L.map("intelMap",{zoomControl:false})
-  .setView([31.95,35.91],8);
+  intelMap = L.map("intelMap", {
+    zoomControl:true
+  }).setView([31.95,35.91],12);
 
-satellite.clone = undefined;
+  satellite.addTo(intelMap);
 
-L.tileLayer(
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-  {
-    maxZoom:19,
-    attribution:"Tiles &copy; Esri"
-  }
-).addTo(intelMap);
+  map.on("click", e => {
+    setPointTarget(e.latlng.lat,e.latlng.lng,true);
+  });
 
+  intelMap.on("click", handleIntelClick);
 
-/* ---------- LAYER SWITCH ---------- */
-
-document.querySelectorAll(".layerBtn").forEach(btn=>{
-
-  btn.onclick=()=>{
-
-    document.querySelectorAll(".layerBtn")
-      .forEach(x=>x.classList.remove("active"));
-
-    btn.classList.add("active");
-
-    map.eachLayer(layer=>{
-      if(
-        layer===street ||
-        layer===satellite ||
-        layer===terrain
-      ){
-        map.removeLayer(layer);
-      }
-    });
-
-    const type=btn.dataset.layer;
-
-    if(type==="street")street.addTo(map);
-    if(type==="satellite")satellite.addTo(map);
-    if(type==="terrain")terrain.addTo(map);
-
-    currentLayer=type;
-  };
-
+  showToast("TERRA X 7.1 جاهز 🚀");
 });
 
+/* =========================================================
+   BASE MAP
+   ========================================================= */
 
-/* ---------- HELPERS ---------- */
+function setBase(type){
 
-function escapeHTML(text){
-
-  return String(text ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
-
-
-function formatNumber(n){
-
-  if(n===null || n===undefined || Number.isNaN(Number(n)))
-    return "—";
-
-  return Number(n).toLocaleString("en-US");
-}
-
-
-function formatDate(date){
-
-  if(!date)return "Unknown";
-
-  try{
-    return new Date(date).toLocaleString();
-  }catch{
-    return date;
+  if(currentBase){
+    map.removeLayer(currentBase);
   }
+
+  if(type==="street") currentBase=street;
+  if(type==="satellite") currentBase=satellite;
+  if(type==="terrain") currentBase=terrain;
+
+  currentBase.addTo(map);
 }
 
+/* =========================================================
+   SEARCH
+   ========================================================= */
 
-function setProgress(value,text){
+async function searchPlace(){
 
-  document.getElementById("progressBar").style.width=value+"%";
+  const input=document.getElementById("searchInput");
+  const q=input.value.trim();
 
-  if(text)
-    document.getElementById("analysisText").textContent=text;
-}
+  if(!q) return;
 
-
-function sleep(ms){
-  return new Promise(r=>setTimeout(r,ms));
-}
-
-
-/* ---------- SEARCH ---------- */
-
-async function searchPlace(query){
-
-  if(!query.trim())return;
-
-  const resultsBox=document.getElementById("results");
-
-  resultsBox.innerHTML=
-    `<div class="result">🔎 جاري البحث...</div>`;
+  const results=document.getElementById("results");
+  results.innerHTML='<div class="loading">جاري البحث...</div>';
 
   try{
-
-    /*
-      Nominatim is intentionally called only after
-      an explicit user search.
-    */
 
     const url=
       "https://nominatim.openstreetmap.org/search"+
@@ -760,7 +645,7 @@ async function searchPlace(query){
       "&addressdetails=1"+
       "&namedetails=1"+
       "&limit=8"+
-      "&q="+encodeURIComponent(query);
+      "&q="+encodeURIComponent(q);
 
     const response=await fetch(url,{
       headers:{
@@ -768,511 +653,907 @@ async function searchPlace(query){
       }
     });
 
-    if(!response.ok)
-      throw new Error("Search service unavailable");
-
     const data=await response.json();
 
+    results.innerHTML="";
+
     if(!data.length){
-
-      resultsBox.innerHTML=
-        `<div class="result">لا توجد نتائج.</div>`;
-
+      results.innerHTML="لا توجد نتائج.";
       return;
     }
 
-    resultsBox.innerHTML="";
-
-    data.forEach(place=>{
+    data.forEach(item=>{
 
       const div=document.createElement("div");
       div.className="result";
 
-      div.innerHTML=`
-        <strong>${escapeHTML(
-          place.display_name
-        )}</strong>
-        <small>
-          ${Number(place.lat).toFixed(5)},
-          ${Number(place.lon).toFixed(5)}
-        </small>
-      `;
+      div.innerHTML=
+        "<strong>"+escapeHtml(item.display_name)+"</strong>"+
+        "<small>"+item.type+"</small>";
 
       div.onclick=()=>{
 
-        const lat=Number(place.lat);
-        const lon=Number(place.lon);
-
-        setTarget(
-          lat,
-          lon,
-          place.display_name,
-          place.address
-        );
+        const lat=parseFloat(item.lat);
+        const lon=parseFloat(item.lon);
 
         map.setView([lat,lon],15);
 
-        if(targetMarker)
-          map.removeLayer(targetMarker);
+        setPointTarget(lat,lon,true);
 
-        targetMarker=L.marker([lat,lon])
-          .addTo(map)
-          .bindPopup(
-            `<b>${escapeHTML(place.display_name)}</b>`
-          )
-          .openPopup();
+        results.innerHTML="";
       };
 
-      resultsBox.appendChild(div);
-
+      results.appendChild(div);
     });
 
-  }catch(error){
+  }catch(err){
 
-    resultsBox.innerHTML=
-      `<div class="result">⚠️ تعذر الاتصال بخدمة البحث.</div>`;
+    results.innerHTML=
+      "تعذر الاتصال بخدمة البحث.";
 
-    console.error(error);
+    console.error(err);
   }
 }
 
+function quickSearch(q){
 
-document.getElementById("searchBtn").onclick=()=>{
-  searchPlace(document.getElementById("searchInput").value);
-};
+  document.getElementById("searchInput").value=q;
+  searchPlace();
+}
 
+/* =========================================================
+   TARGET SYSTEM
+   ========================================================= */
 
-document.getElementById("searchInput")
-.addEventListener("keydown",e=>{
-  if(e.key==="Enter"){
-    searchPlace(e.target.value);
-  }
-});
-
-
-/* ---------- TARGET ---------- */
-
-async function setTarget(lat,lon,name,address){
+function setPointTarget(lat,lon,openIntelAfter=false){
 
   target={
-    lat,
-    lon,
-    name:name || "Selected location",
-    address:address || {}
+    type:"point",
+    lat:lat,
+    lon:lon,
+    createdAt:new Date().toISOString()
   };
 
-  document.getElementById("targetName").textContent=target.name;
+  currentArea=null;
+  currentRadius=null;
 
-  document.getElementById("targetCoords").textContent=
-    `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-
-  intelMap.setView([lat,lon],14);
+  clearSelectionLayers();
 
   if(targetMarker){
-
     map.removeLayer(targetMarker);
   }
 
   targetMarker=L.marker([lat,lon])
     .addTo(map)
-    .bindPopup("TERRA X TARGET");
+    .bindPopup("🎯 TERRA X TARGET")
+    .openPopup();
 
-  await reverseTarget();
+  updateTargetUI();
 
+  reverseGeocode(lat,lon);
+
+  if(openIntelAfter){
+    openIntel();
+  }
 }
 
-
-/* ---------- REVERSE GEOCODING ---------- */
-
-async function reverseTarget(){
-
-  if(!target)return;
+async function reverseGeocode(lat,lon){
 
   try{
 
     const url=
       "https://nominatim.openstreetmap.org/reverse"+
       "?format=jsonv2"+
-      "&lat="+target.lat+
-      "&lon="+target.lon+
+      "&lat="+lat+
+      "&lon="+lon+
       "&addressdetails=1";
 
-    const response=await fetch(url,{
-      headers:{
-        "Accept":"application/json"
-      }
-    });
+    const r=await fetch(url);
+    const d=await r.json();
 
-    if(!response.ok)return;
-
-    const data=await response.json();
-
-    target.address=data.address || {};
-
-    if(data.display_name){
-
-      target.name=data.display_name;
-
-      document.getElementById("targetName")
-        .textContent=data.display_name;
+    if(target){
+      target.name=d.display_name || "Unknown";
+      target.address=d.address || {};
     }
 
-    await loadTargetIntelligence();
+    updateTargetUI();
 
-  }catch(error){
-
-    console.error(error);
-
-    await loadTargetIntelligence();
+  }catch(e){
+    console.log(e);
   }
 }
 
-
-/* ---------- GPS ---------- */
-
-document.getElementById("gpsBtn").onclick=()=>{
-
-  if(!navigator.geolocation){
-
-    alert("المتصفح لا يدعم GPS");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    async position=>{
-
-      const lat=position.coords.latitude;
-      const lon=position.coords.longitude;
-
-      if(userMarker)
-        map.removeLayer(userMarker);
-
-      userMarker=L.marker([lat,lon])
-        .addTo(map)
-        .bindPopup("📍 YOUR LOCATION")
-        .openPopup();
-
-      map.setView([lat,lon],16);
-
-      await setTarget(
-        lat,
-        lon,
-        "Current Location"
-      );
-
-    },
-    ()=>{
-      alert("تعذر الحصول على موقعك.");
-    },
-    {
-      enableHighAccuracy:true,
-      timeout:10000,
-      maximumAge:0
-    }
-  );
-
-};
-
-
-/* ---------- INTELLIGENCE SCREEN ---------- */
+/* =========================================================
+   INTELLIGENCE SCREEN
+   ========================================================= */
 
 function openIntel(){
 
-  document.getElementById("intel").style.display="block";
+  document.getElementById("mapScreen")
+    .classList.remove("active");
+
+  document.getElementById("intelScreen")
+    .classList.add("active");
 
   setTimeout(()=>{
+
     intelMap.invalidateSize();
 
     if(target){
-      intelMap.setView(
-        [target.lat,target.lon],
-        14
-      );
+
+      if(target.type==="point"){
+        intelMap.setView(
+          [target.lat,target.lon],
+          Math.max(intelMap.getZoom(),14)
+        );
+      }
+
+      updateIntelMarker();
+
     }
 
-  },200);
+  },100);
 
-  if(target)
-    loadTargetIntelligence();
+  updateTargetUI();
 }
-
 
 function closeIntel(){
 
-  document.getElementById("intel").style.display="none";
+  document.getElementById("intelScreen")
+    .classList.remove("active");
+
+  document.getElementById("mapScreen")
+    .classList.add("active");
+
+  setTimeout(()=>{
+    map.invalidateSize();
+  },100);
 }
 
+/* =========================================================
+   INTELLIGENCE MAP CLICK ENGINE
+   ========================================================= */
 
-/* ---------- CATEGORY SEARCH ---------- */
+function handleIntelClick(e){
 
-const categoryMap={
+  const lat=e.latlng.lat;
+  const lon=e.latlng.lng;
 
-  hospital:
-    '["amenity"="hospital"]',
+  if(targetMode==="point"){
 
-  school:
-    '["amenity"="school"]',
+    setPointTarget(lat,lon,false);
 
-  university:
-    '["amenity"="university"]',
+    updateIntelMarker();
 
-  pharmacy:
-    '["amenity"="pharmacy"]',
+    intelMap.setView([lat,lon],15);
 
-  restaurant:
-    '["amenity"="restaurant"]',
+    showToast("تم تحديد النقطة 📍");
 
-  hotel:
-    '["tourism"="hotel"]',
+    targetMode=null;
+    setToolActive(null);
 
-  mosque:
-    '["amenity"="place_of_worship"]["religion"="muslim"]'
-
-};
-
-
-async function runSearchType(type){
-
-  if(!target){
-
-    alert("حدد موقعًا أولًا.");
     return;
   }
 
-  const query=
-  `
-  [out:json][timeout:20];
-  (
-    node${categoryMap[type]}(around:3000,${target.lat},${target.lon});
-    way${categoryMap[type]}(around:3000,${target.lat},${target.lon});
-  );
-  out center tags;
-  `;
+  if(targetMode==="area"){
 
-  const endpoints=[
+    areaPoints.push([lat,lon]);
+
+    redrawTemporaryArea();
+
+    showHint(
+      "النقاط: "+areaPoints.length+
+      " — أضف نقاطاً ثم اضغط ✓ إنهاء"
+    );
+
+    return;
+  }
+
+  if(targetMode==="radius"){
+
+    setRadiusTarget(lat,lon,radiusMeters);
+
+    targetMode=null;
+
+    setToolActive(null);
+
+    hideHint();
+
+    return;
+  }
+
+}
+
+/* =========================================================
+   POINT MODE
+   ========================================================= */
+
+function startPointMode(){
+
+  cancelSelection();
+
+  targetMode="point";
+
+  setToolActive("pointTool");
+
+  showHint("اضغط على الخريطة لتحديد نقطة 📍");
+}
+
+/* =========================================================
+   AREA MODE
+   ========================================================= */
+
+function startAreaMode(){
+
+  cancelSelection();
+
+  targetMode="area";
+
+  areaPoints=[];
+
+  setToolActive("areaTool");
+
+  showHint("اضغط عدة نقاط حول المنطقة ثم ✓ إنهاء");
+}
+
+function redrawTemporaryArea(){
+
+  if(areaLayer){
+    intelMap.removeLayer(areaLayer);
+  }
+
+  if(areaPoints.length===1){
+
+    L.circleMarker(areaPoints[0],{
+      radius:6,
+      weight:2
+    }).addTo(intelMap);
+
+    return;
+  }
+
+  areaLayer=L.polygon(areaPoints,{
+    weight:2,
+    fillOpacity:.15
+  }).addTo(intelMap);
+}
+
+function finishArea(){
+
+  if(targetMode!=="area"){
+    showToast("ابدأ أولاً بوضع 🔷 منطقة");
+    return;
+  }
+
+  if(areaPoints.length<3){
+
+    showToast("تحتاج المنطقة إلى 3 نقاط على الأقل");
+    return;
+  }
+
+  if(areaLayer){
+    intelMap.removeLayer(areaLayer);
+  }
+
+  areaLayer=L.polygon(areaPoints,{
+    weight:3,
+    fillOpacity:.18
+  }).addTo(intelMap);
+
+  const area=polygonArea(areaPoints);
+
+  currentArea={
+    coordinates:areaPoints.map(p=>[p[0],p[1]]),
+    areaM2:area
+  };
+
+  const center=polygonCenter(areaPoints);
+
+  target={
+    type:"area",
+    lat:center[0],
+    lon:center[1],
+    areaM2:area,
+    polygon:areaPoints.map(p=>[p[0],p[1]]),
+    createdAt:new Date().toISOString()
+  };
+
+  currentRadius=null;
+
+  updateTargetUI();
+
+  updateIntelMarker();
+
+  targetMode=null;
+
+  setToolActive(null);
+
+  hideHint();
+
+  updateStats();
+
+  showToast(
+    "تم تحديد المنطقة • "+
+    formatArea(area)
+  );
+}
+
+/* =========================================================
+   RADIUS MODE
+   ========================================================= */
+
+function toggleRadiusMenu(){
+
+  document.getElementById("radiusMenu")
+    .classList.toggle("show");
+}
+
+function startRadiusMode(meters){
+
+  document.getElementById("radiusMenu")
+    .classList.remove("show");
+
+  cancelSelection();
+
+  radiusMeters=meters;
+
+  targetMode="radius";
+
+  setToolActive("radiusTool");
+
+  showHint(
+    "اضغط على الخريطة لوضع نصف قطر "+
+    formatDistance(meters)
+  );
+}
+
+function setRadiusTarget(lat,lon,meters){
+
+  clearSelectionLayers();
+
+  currentRadius={
+    lat:lat,
+    lon:lon,
+    radius:meters
+  };
+
+  target={
+    type:"radius",
+    lat:lat,
+    lon:lon,
+    radius:meters,
+    createdAt:new Date().toISOString()
+  };
+
+  radiusLayer=L.circle([lat,lon],{
+    radius:meters,
+    weight:3,
+    fillOpacity:.12
+  }).addTo(intelMap);
+
+  updateTargetUI();
+  updateIntelMarker();
+  updateStats();
+
+  intelMap.fitBounds(radiusLayer.getBounds(),{
+    padding:[40,40]
+  });
+
+  showToast(
+    "تم تحديد نطاق "+
+    formatDistance(meters)
+  );
+}
+
+/* =========================================================
+   UNDO / CANCEL
+   ========================================================= */
+
+function undoAreaPoint(){
+
+  if(targetMode!=="area"){
+
+    showToast("التراجع يعمل أثناء رسم المنطقة");
+
+    return;
+  }
+
+  if(areaPoints.length===0) return;
+
+  areaPoints.pop();
+
+  redrawTemporaryArea();
+
+  showHint(
+    "النقاط: "+
+    areaPoints.length+
+    " — أضف نقاطاً ثم اضغط ✓ إنهاء"
+  );
+}
+
+function cancelSelection(){
+
+  targetMode=null;
+
+  areaPoints=[];
+
+  if(areaLayer){
+    intelMap.removeLayer(areaLayer);
+    areaLayer=null;
+  }
+
+  clearRadiusOnly();
+
+  setToolActive(null);
+
+  hideHint();
+}
+
+function clearRadiusOnly(){
+
+  if(radiusLayer){
+
+    intelMap.removeLayer(radiusLayer);
+
+    radiusLayer=null;
+  }
+
+  currentRadius=null;
+}
+
+function clearSelectionLayers(){
+
+  if(areaLayer){
+    intelMap.removeLayer(areaLayer);
+    areaLayer=null;
+  }
+
+  if(radiusLayer){
+    intelMap.removeLayer(radiusLayer);
+    radiusLayer=null;
+  }
+
+  areaPoints=[];
+}
+
+/* =========================================================
+   INTEL MARKER
+   ========================================================= */
+
+function updateIntelMarker(){
+
+  if(intelTargetMarker){
+
+    intelMap.removeLayer(intelTargetMarker);
+
+    intelTargetMarker=null;
+  }
+
+  if(!target) return;
+
+  intelTargetMarker=L.marker(
+    [target.lat,target.lon]
+  ).addTo(intelMap);
+
+  if(target.type==="area" && target.polygon){
+
+    if(areaLayer){
+      intelMap.fitBounds(areaLayer.getBounds(),{
+        padding:[40,40]
+      });
+    }
+
+  }
+
+  if(target.type==="radius" && radiusLayer){
+
+    intelMap.fitBounds(radiusLayer.getBounds(),{
+      padding:[40,40]
+    });
+
+  }
+}
+
+/* =========================================================
+   UI
+   ========================================================= */
+
+function updateTargetUI(){
+
+  const badge=document.getElementById("targetBadge");
+
+  if(!target){
+
+    badge.textContent="TARGET: لا يوجد هدف";
+
+    return;
+  }
+
+  let text="";
+
+  if(target.type==="point"){
+    text="POINT";
+  }
+
+  if(target.type==="area"){
+    text="AREA • "+formatArea(target.areaM2);
+  }
+
+  if(target.type==="radius"){
+    text="RADIUS • "+formatDistance(target.radius);
+  }
+
+  if(target.name){
+    text+=" • "+target.name;
+  }
+
+  badge.textContent="TARGET: "+text;
+
+  updateStats();
+}
+
+function updateStats(){
+
+  document.getElementById("statType").textContent=
+    target?
+    (
+      target.type==="point"?"POINT":
+      target.type==="area"?"AREA":
+      "RADIUS"
+    ):
+    "—";
+
+  let areaText="—";
+
+  if(target){
+
+    if(target.type==="area"){
+      areaText=formatArea(target.areaM2);
+    }
+
+    if(target.type==="radius"){
+      areaText=formatArea(
+        Math.PI*target.radius*target.radius
+      );
+    }
+  }
+
+  document.getElementById("statArea").textContent=
+    areaText;
+}
+
+function setToolActive(id){
+
+  document
+    .querySelectorAll(".toolBtn")
+    .forEach(b=>b.classList.remove("active"));
+
+  if(id){
+
+    const el=document.getElementById(id);
+
+    if(el) el.classList.add("active");
+  }
+}
+
+function showHint(text){
+
+  const el=document.getElementById("selectionHint");
+
+  el.textContent=text;
+
+  el.classList.add("show");
+}
+
+function hideHint(){
+
+  document
+    .getElementById("selectionHint")
+    .classList.remove("show");
+}
+
+/* =========================================================
+   AREA MATH
+   ========================================================= */
+
+function polygonArea(coords){
+
+  if(coords.length<3) return 0;
+
+  const R=6378137;
+
+  let area=0;
+
+  for(let i=0;i<coords.length;i++){
+
+    const p1=coords[i];
+    const p2=coords[(i+1)%coords.length];
+
+    const lat1=p1[0]*Math.PI/180;
+    const lat2=p2[0]*Math.PI/180;
+
+    const lon1=p1[1]*Math.PI/180;
+    const lon2=p2[1]*Math.PI/180;
+
+    area +=
+      (lon2-lon1)*
+      (2+
+      Math.sin(lat1)+
+      Math.sin(lat2));
+  }
+
+  area=Math.abs(area)*R*R/2;
+
+  return area;
+}
+
+function polygonCenter(coords){
+
+  let lat=0;
+  let lon=0;
+
+  coords.forEach(p=>{
+    lat+=p[0];
+    lon+=p[1];
+  });
+
+  return[
+    lat/coords.length,
+    lon/coords.length
+  ];
+}
+
+function formatArea(m2){
+
+  if(!m2 || !isFinite(m2)) return "—";
+
+  if(m2<10000){
+    return Math.round(m2)+" m²";
+  }
+
+  if(m2<1000000){
+    return (m2/10000).toFixed(2)+" ha";
+  }
+
+  return (m2/1000000).toFixed(2)+" km²";
+}
+
+function formatDistance(m){
+
+  if(m<1000){
+    return Math.round(m)+" m";
+  }
+
+  return (m/1000).toFixed(1)+" km";
+}
+
+/* =========================================================
+   BUILDING ANALYSIS
+   ========================================================= */
+
+async function analyzeBuildings(){
+
+  if(!target){
+
+    showToast("حدد هدفاً أولاً");
+
+    return;
+  }
+
+  document.getElementById("statBuildings")
+    .textContent="...";
+
+  logIntel("جارٍ تحليل المباني من OpenStreetMap...");
+
+  let query="";
+
+  if(target.type==="radius"){
+
+    query=`
+      [out:json][timeout:30];
+      (
+        way["building"](around:${target.radius},${target.lat},${target.lon});
+        relation["building"](around:${target.radius},${target.lat},${target.lon});
+      );
+      out center tags;
+    `;
+
+  }else{
+
+    const r=
+      target.type==="area"?
+      getAreaRadius(target.polygon):
+      2000;
+
+    query=`
+      [out:json][timeout:30];
+      (
+        way["building"](around:${Math.max(r,1000)},${target.lat},${target.lon});
+        relation["building"](around:${Math.max(r,1000)},${target.lat},${target.lon});
+      );
+      out center tags;
+    `;
+  }
+
+  const servers=[
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter"
   ];
 
   let data=null;
 
-  for(const endpoint of endpoints){
+  for(const server of servers){
 
     try{
 
-      const response=await fetch(endpoint,{
+      const response=await fetch(server,{
         method:"POST",
-        body:query
+        headers:{
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+        body:"data="+encodeURIComponent(query)
       });
 
-      if(!response.ok)continue;
+      if(!response.ok) continue;
 
       data=await response.json();
 
-      break;
+      if(data) break;
 
-    }catch(error){}
+    }catch(e){
+      console.log("Overpass failed",server,e);
+    }
   }
 
   if(!data){
 
-    alert("تعذر الوصول إلى بيانات OpenStreetMap الآن.");
+    document.getElementById("statBuildings")
+      .textContent="N/A";
+
+    logIntel(
+      "تعذر الوصول إلى خادم المباني حالياً."
+    );
+
     return;
   }
 
-  const results=document.getElementById("results");
+  let elements=data.elements||[];
 
-  results.innerHTML=
-    `<div class="result">
-      <strong>${formatNumber(data.elements.length)} نتيجة</strong>
-      <small>ضمن نطاق 3 كم</small>
-    </div>`;
+  /*
+    إذا كان الهدف منطقة:
+    نفلتر مراكز المباني داخل المضلع تقريبياً.
+  */
 
-  data.elements.slice(0,30).forEach(el=>{
+  if(target.type==="area"){
 
-    const lat=
-      el.lat ??
-      el.center?.lat;
+    elements=elements.filter(el=>{
 
-    const lon=
-      el.lon ??
-      el.center?.lon;
+      if(!el.center) return false;
 
-    if(lat===undefined || lon===undefined)return;
+      return pointInPolygon(
+        [
+          el.center.lat,
+          el.center.lon
+        ],
+        target.polygon
+      );
+    });
+  }
 
-    const name=
-      el.tags?.name ||
-      el.tags?.["name:en"] ||
-      type;
+  if(buildingLayer){
 
-    const div=document.createElement("div");
+    intelMap.removeLayer(buildingLayer);
+  }
 
-    div.className="result";
+  buildingLayer=L.layerGroup().addTo(intelMap);
 
-    div.innerHTML=
-      `<strong>${escapeHTML(name)}</strong>
-       <small>${type} • ${lat.toFixed(5)}, ${lon.toFixed(5)}</small>`;
+  elements.forEach(el=>{
 
-    div.onclick=()=>{
-      map.setView([lat,lon],17);
-    };
+    if(!el.center) return;
 
-    results.appendChild(div);
+    const marker=L.circleMarker(
+      [el.center.lat,el.center.lon],
+      {
+        radius:3,
+        weight:1
+      }
+    );
 
+    marker.bindPopup(
+      "🏢 Building"+
+      "<br>"+escapeHtml(
+        el.tags?.name ||
+        el.tags?.building ||
+        "Unnamed"
+      )
+    );
+
+    marker.addTo(buildingLayer);
   });
 
-}
+  document.getElementById("statBuildings")
+    .textContent=elements.length.toLocaleString();
 
-
-/* ---------- BUILDING ENGINE ---------- */
-
-async function analyzeBuildings(){
-
-  if(!target)
-    throw new Error("No target");
-
-  const endpoints=[
-    "https://overpass-api.de/api/interpreter",
-    "https://overpass.kumi.systems/api/interpreter"
-  ];
-
-  const query=`
-  [out:json][timeout:25];
-  (
-    way["building"](around:2000,${target.lat},${target.lon});
-    relation["building"](around:2000,${target.lat},${target.lon});
+  logIntel(
+    "Building Analysis: "+
+    elements.length.toLocaleString()+
+    " mapped buildings."
   );
-  out center tags;
-  `;
-
-  for(const endpoint of endpoints){
-
-    try{
-
-      const response=await fetch(endpoint,{
-        method:"POST",
-        body:query
-      });
-
-      if(!response.ok)continue;
-
-      const data=await response.json();
-
-      const count=data.elements.length;
-
-      lastBuildingCount=count;
-
-      document.getElementById("buildingValue")
-        .textContent=formatNumber(count);
-
-      document.getElementById("buildingSub")
-        .textContent="OSM / Overpass • radius 2 km";
-
-      return count;
-
-    }catch(error){
-
-      console.log("Overpass failed",endpoint);
-    }
-  }
-
-  document.getElementById("buildingValue")
-    .textContent="N/A";
-
-  throw new Error("Building data unavailable");
 }
 
+function getAreaRadius(poly){
 
-/* ---------- WORLD BANK ---------- */
+  const c=polygonCenter(poly);
 
-async function loadCountryData(){
+  let max=0;
 
-  const code=
-    target?.address?.country_code;
+  poly.forEach(p=>{
 
-  if(!code){
+    const d=haversine(
+      c[0],c[1],
+      p[0],p[1]
+    );
 
-    document.getElementById("countryValue")
-      .textContent="—";
+    max=Math.max(max,d);
+  });
 
-    return null;
-  }
-
-  const countryCode=code.toLowerCase();
-
-  document.getElementById("countryValue")
-    .textContent=
-      (target.address.country || countryCode).slice(0,18);
-
-  document.getElementById("countrySub")
-    .textContent="World Bank";
-
-  const indicators={
-    population:"SP.POP.TOTL",
-    gdp:"NY.GDP.MKTP.CD",
-    life:"SP.DYN.LE00.IN"
-  };
-
-  const data={};
-
-  for(const key in indicators){
-
-    try{
-
-      const url=
-        `https://api.worldbank.org/v2/country/${countryCode}/indicator/${indicators[key]}?format=json&mrnev=5&per_page=5`;
-
-      const response=await fetch(url);
-
-      if(!response.ok)continue;
-
-      const json=await response.json();
-
-      if(
-        Array.isArray(json) &&
-        Array.isArray(json[1])
-      ){
-
-        const valid=json[1].find(
-          x=>x.value!==null
-        );
-
-        if(valid){
-
-          data[key]={
-            value:valid.value,
-            year:valid.date,
-            indicator:indicators[key]
-          };
-        }
-      }
-
-    }catch(error){
-      console.error(error);
-    }
-  }
-
-  lastCountryData=data;
-
-  if(data.population){
-
-    document.getElementById("populationValue")
-      .textContent=formatNumber(data.population.value);
-
-    document.getElementById("populationSub")
-      .textContent=
-        `World Bank • ${data.population.year}`;
-  }
-
-  renderFusion();
-
-  return data;
+  return Math.max(max*1.5,1000);
 }
 
+function pointInPolygon(point,polygon){
 
-/* ---------- NASA EONET ---------- */
+  const lat=point[0];
+  const lon=point[1];
 
-async function loadEarthEvents(){
+  let inside=false;
+
+  for(
+    let i=0,j=polygon.length-1;
+    i<polygon.length;
+    j=i++
+  ){
+
+    const xi=polygon[i][1];
+    const yi=polygon[i][0];
+
+    const xj=polygon[j][1];
+    const yj=polygon[j][0];
+
+    const intersect=
+      ((yi>lat)!==(yj>lat)) &&
+      (
+        lon<
+        (xj-xi)*
+        (lat-yi)/
+        (yj-yi)+xi
+      );
+
+    if(intersect) inside=!inside;
+  }
+
+  return inside;
+}
+
+/* =========================================================
+   NASA EARTH EVENTS
+   ========================================================= */
+
+async function analyzeEvents(){
+
+  if(!target){
+
+    showToast("حدد هدفاً أولاً");
+
+    return;
+  }
+
+  document.getElementById("statEvents")
+    .textContent="...";
+
+  logIntel(
+    "جارٍ جلب الأحداث الطبيعية المفتوحة من NASA EONET..."
+  );
 
   try{
 
@@ -1282,919 +1563,517 @@ async function loadEarthEvents(){
 
     const response=await fetch(url);
 
-    if(!response.ok)
-      throw new Error("EONET failed");
-
     const data=await response.json();
 
-    lastEvents=data.events || [];
+    const events=data.events||[];
 
-    document.getElementById("eventValue")
-      .textContent=formatNumber(lastEvents.length);
+    if(eventLayer){
 
-    renderEvents();
+      map.removeLayer(eventLayer);
 
-    drawEvents();
-
-    return lastEvents;
-
-  }catch(error){
-
-    console.error(error);
-
-    document.getElementById("eventValue")
-      .textContent="N/A";
-
-    document.getElementById("eventsData").innerHTML=
-      `<div class="empty">
-        تعذر تحميل أحداث NASA الآن.
-      </div>`;
-
-    return [];
-  }
-}
-
-
-/* ---------- EVENT RENDER ---------- */
-
-function renderEvents(){
-
-  const box=document.getElementById("eventsData");
-
-  if(!lastEvents.length){
-
-    box.innerHTML=
-      `<div class="empty">
-        لا توجد أحداث مفتوحة في البيانات المستلمة.
-      </div>`;
-
-    return;
-  }
-
-  box.innerHTML="";
-
-  lastEvents.slice(0,15).forEach(event=>{
-
-    const category=
-      event.categories?.map(c=>c.title).join(", ") ||
-      "Unknown";
-
-    const geometry=
-      event.geometry?.[event.geometry.length-1];
-
-    const date=geometry?.date || "";
-
-    const div=document.createElement("div");
-
-    div.className="event";
-
-    div.innerHTML=`
-      <b>${escapeHTML(event.title)}</b>
-      <small>
-        ${escapeHTML(category)}
-        ${date ? " • "+escapeHTML(date) : ""}
-      </small>
-    `;
-
-    box.appendChild(div);
-
-  });
-
-}
-
-
-/* ---------- DRAW NASA EVENTS ---------- */
-
-function drawEvents(){
-
-  if(eventLayer){
-
-    map.removeLayer(eventLayer);
-  }
-
-  eventLayer=L.layerGroup().addTo(map);
-
-  lastEvents.forEach(event=>{
-
-    const geometry=
-      event.geometry?.[event.geometry.length-1];
-
-    if(!geometry)return;
-
-    if(
-      geometry.type==="Point" &&
-      Array.isArray(geometry.coordinates)
-    ){
-
-      const lon=geometry.coordinates[0];
-      const lat=geometry.coordinates[1];
-
-      if(
-        typeof lat!=="number" ||
-        typeof lon!=="number"
-      )return;
-
-      L.circleMarker(
-        [lat,lon],
-        {
-          radius:5,
-          color:"#ff765f",
-          fillColor:"#ff765f",
-          fillOpacity:.8
-        }
-      )
-      .bindPopup(
-        `<b>${escapeHTML(event.title)}</b>
-         <br>${escapeHTML(
-           event.categories?.[0]?.title || ""
-         )}`
-      )
-      .addTo(eventLayer);
+      intelMap.removeLayer(eventLayer);
     }
 
-  });
+    eventLayer=L.layerGroup();
 
-}
+    let count=0;
 
+    events.forEach(event=>{
 
-/* ---------- DATA FUSION ---------- */
+      const geo=event.geometry||
+        [];
 
-function renderFusion(){
+      if(!geo.length) return;
 
-  const box=document.getElementById("fusionData");
+      const latest=geo[geo.length-1];
 
-  if(!target){
+      if(!latest.coordinates) return;
 
-    box.innerHTML=
-      `<div class="empty">No target.</div>`;
+      let lon;
+      let lat;
 
-    return;
-  }
+      if(Array.isArray(latest.coordinates)){
 
-  const country=
-    target.address?.country ||
-    "Unknown";
+        lon=parseFloat(latest.coordinates[0]);
+        lat=parseFloat(latest.coordinates[1]);
 
-  const population=
-    lastCountryData?.population;
+      }else{
+        return;
+      }
 
-  const gdp=
-    lastCountryData?.gdp;
+      let relevant=false;
 
-  const life=
-    lastCountryData?.life;
+      if(target.type==="point"){
 
-  box.innerHTML=`
+        const d=haversine(
+          target.lat,
+          target.lon,
+          lat,
+          lon
+        );
 
-    <div class="row">
-      <span>📍 Target</span>
-      <b>${escapeHTML(country)}</b>
-    </div>
+        relevant=d<=100000;
+      }
 
-    <div class="row">
-      <span>👥 Population</span>
-      <b>
-        ${
-          population
-          ? formatNumber(population.value)
-          : "Unavailable"
-        }
-      </b>
-    </div>
+      if(target.type==="radius"){
 
-    <div class="row">
-      <span>💰 GDP</span>
-      <b>
-        ${
-          gdp
-          ? formatNumber(gdp.value)
-          : "Unavailable"
-        }
-      </b>
-    </div>
+        const d=haversine(
+          target.lat,
+          target.lon,
+          lat,
+          lon
+        );
 
-    <div class="row">
-      <span>❤️ Life expectancy</span>
-      <b>
-        ${
-          life
-          ? Number(life.value).toFixed(1)+" years"
-          : "Unavailable"
-        }
-      </b>
-    </div>
+        relevant=d<=target.radius;
+      }
 
-    <div class="row">
-      <span>🏢 OSM Buildings</span>
-      <b>
-        ${
-          lastBuildingCount !== null
-          ? formatNumber(lastBuildingCount)
-          : "Unavailable"
-        }
-      </b>
-    </div>
+      if(target.type==="area"){
 
-    <div class="row">
-      <span>🌋 NASA Events</span>
-      <b>${formatNumber(lastEvents.length)}</b>
-    </div>
+        relevant=pointInPolygon(
+          [lat,lon],
+          target.polygon
+        );
+      }
 
-    <div class="source">
-      Multiple-source fusion:
-      OpenStreetMap + World Bank + NASA EONET.
-    </div>
-  `;
-}
+      if(relevant){
 
+        count++;
 
-/* ---------- SNAPSHOTS ---------- */
+        const marker=L.circleMarker(
+          [lat,lon],
+          {
+            radius:6,
+            weight:2
+          }
+        );
 
-function snapshotKey(){
+        marker.bindPopup(
+          "<strong>🌋 "+
+          escapeHtml(event.title||"Natural Event")+
+          "</strong>"+
+          "<br>"+
+          escapeHtml(event.categories?.map(
+            x=>x.title
+          ).join(", ")||"")+
+          "<br><small>NASA EONET</small>"
+        );
 
-  if(!target)return null;
+        marker.addTo(eventLayer);
+      }
+    });
 
-  return [
-    "terraX7",
-    target.lat.toFixed(5),
-    target.lon.toFixed(5)
-  ].join("_");
-}
+    eventLayer.addTo(intelMap);
 
+    document.getElementById("statEvents")
+      .textContent=count;
 
-function getSnapshots(){
-
-  const key=snapshotKey();
-
-  if(!key)return [];
-
-  try{
-
-    return JSON.parse(
-      localStorage.getItem(key) || "[]"
+    logIntel(
+      "NASA EONET: "+
+      count+
+      " relevant open events found."
     );
 
-  }catch{
+  }catch(e){
 
-    return [];
+    document.getElementById("statEvents")
+      .textContent="N/A";
+
+    logIntel(
+      "تعذر تحميل أحداث NASA حالياً."
+    );
   }
 }
 
+/* =========================================================
+   FULL TARGET ANALYSIS
+   ========================================================= */
 
-function saveSnapshot(){
+async function analyzeTarget(){
 
   if(!target){
 
-    alert("حدد Target أولًا.");
+    showToast(
+      "حدد نقطة أو منطقة أو نصف قطر أولاً"
+    );
+
     return;
   }
 
-  if(lastBuildingCount===null){
-
-    alert("شغّل Building Analysis أولًا.");
-    return;
-  }
-
-  const snapshots=getSnapshots();
-
-  const snap={
-    time:new Date().toISOString(),
-    buildings:lastBuildingCount,
-    events:lastEvents.length,
-    population:
-      lastCountryData?.population?.value ?? null
-  };
-
-  snapshots.push(snap);
-
-  /*
-    Keep a local history only.
-    This is not pretending to be historical satellite imagery.
-  */
-
-  localStorage.setItem(
-    snapshotKey(),
-    JSON.stringify(snapshots.slice(-20))
+  logIntel(
+    "TERRA X DATA FUSION بدأ التحليل..."
   );
 
-  renderChange();
+  await Promise.allSettled([
+    analyzeBuildings(),
+    analyzeEvents()
+  ]);
 
-  alert("تم حفظ Snapshot حقيقي على جهازك.");
+  logIntel(
+    "تمت عملية Data Fusion الأساسية. "+
+    "البيانات المعروضة مرتبطة بمصادر خارجية."
+  );
 }
 
+/* =========================================================
+   ASK TERRA
+   ========================================================= */
 
-/* ---------- CHANGE INTELLIGENCE ---------- */
+function askTerra(command){
 
-function renderChange(){
-
-  const box=document.getElementById("changeData");
-
-  const snapshots=getSnapshots();
-
-  if(!snapshots.length){
-
-    box.innerHTML=
-      `<div class="empty">
-        لا توجد Snapshot سابقة.
-        احفظ القياس الحالي ثم أعد التحليل لاحقًا.
-      </div>`;
-
-    return;
-  }
-
-  const latest=snapshots[snapshots.length-1];
-  const previous=snapshots[snapshots.length-2];
-
-  if(!previous){
-
-    box.innerHTML=`
-      <div class="row">
-        <span>Current snapshot</span>
-        <b>${formatDate(latest.time)}</b>
-      </div>
-
-      <div class="row">
-        <span>Buildings</span>
-        <b>${formatNumber(latest.buildings)}</b>
-      </div>
-
-      <div class="empty">
-        نحتاج Snapshot ثانية لإجراء مقارنة.
-      </div>
-    `;
-
-    return;
-  }
-
-  const diffBuildings=
-    latest.buildings-previous.buildings;
-
-  const diffEvents=
-    latest.events-previous.events;
-
-  const diffPopulation=
-    latest.population!==null &&
-    previous.population!==null
-    ? latest.population-previous.population
-    : null;
-
-  box.innerHTML=`
-
-    <div class="row">
-      <span>Previous scan</span>
-      <b>${formatDate(previous.time)}</b>
-    </div>
-
-    <div class="row">
-      <span>Latest scan</span>
-      <b>${formatDate(latest.time)}</b>
-    </div>
-
-    <div class="row">
-      <span>🏢 Building change</span>
-      <b class="${diffBuildings>0?"good":diffBuildings<0?"bad":""}">
-        ${diffBuildings>0?"+":""}${formatNumber(diffBuildings)}
-      </b>
-    </div>
-
-    <div class="row">
-      <span>🌋 Event-count change</span>
-      <b>
-        ${diffEvents>0?"+":""}${formatNumber(diffEvents)}
-      </b>
-    </div>
-
-    <div class="row">
-      <span>👥 Population data change</span>
-      <b>
-        ${
-          diffPopulation===null
-          ? "N/A"
-          : (diffPopulation>0?"+":"")+
-            formatNumber(diffPopulation)
-        }
-      </b>
-    </div>
-
-    <div class="source">
-      Comparison is between TERRA X snapshots saved on this device.
-      It is not a claim of historical satellite imagery.
-    </div>
-  `;
-
-}
-
-
-/* ---------- LOAD INTELLIGENCE ---------- */
-
-async function loadTargetIntelligence(){
-
-  if(!target)return;
-
-  openIntel();
-
-  setProgress(5,"Initializing GEO Intelligence...");
-
-  document.getElementById("fusionData").innerHTML=
-    `<div class="empty">جاري جمع البيانات من المصادر...</div>`;
-
-  await sleep(250);
-
-  setProgress(20,"Reading geographic target...");
-
-  await sleep(250);
-
-  setProgress(35,"Querying OpenStreetMap buildings...");
-
-  try{
-    await analyzeBuildings();
-  }catch(error){
-    console.error(error);
-  }
-
-  setProgress(55,"Querying World Bank indicators...");
-
-  await loadCountryData();
-
-  setProgress(75,"Loading NASA Earth events...");
-
-  await loadEarthEvents();
-
-  setProgress(90,"Fusing data...");
-
-  renderFusion();
-
-  renderChange();
-
-  setProgress(100,"Analysis complete.");
-
-  lastAnalysis=new Date().toISOString();
-
-}
-
-
-/* ---------- ASK TERRA ---------- */
-
-function setAsk(text){
-
-  document.getElementById("askInput").value=text;
-
-}
-
-
-async function askTerra(){
-
-  const input=
-    document.getElementById("askInput")
-      .value
-      .trim()
-      .toLowerCase();
-
-  const status=
-    document.getElementById("askStatus");
-
-  if(!input){
-
-    status.textContent="اكتب أمرًا أولًا.";
-    return;
-  }
-
-  if(!target){
-
-    status.textContent=
-      "حدد موقعًا أولًا حتى أعرف ماذا أحلل.";
-
-    return;
-  }
-
-  status.textContent="🧠 TERRA يفهم الأمر...";
-
-  /*
-    Natural-language command routing.
-    No fake AI API: commands are interpreted locally.
-  */
+  const c=command.toLowerCase();
 
   if(
-    input.includes("حلل") ||
-    input.includes("analy") ||
-    input.includes("intelligence") ||
-    input.includes("كل شيء")
+    c.includes("حلل")||
+    c.includes("تحليل")||
+    c.includes("analy")
   ){
 
-    status.textContent=
-      "🧠 تشغيل Data Fusion الكامل...";
-
-    await loadTargetIntelligence();
+    analyzeTarget();
 
     return;
   }
 
-
   if(
-    input.includes("مبنى") ||
-    input.includes("مباني") ||
-    input.includes("building")
+    c.includes("مبنى")||
+    c.includes("مباني")||
+    c.includes("building")
   ){
 
-    status.textContent=
-      "🏢 تشغيل Building Intelligence...";
+    analyzeBuildings();
 
-    try{
+    return;
+  }
 
-      await analyzeBuildings();
-      renderFusion();
-      renderChange();
+  if(
+    c.includes("حدث")||
+    c.includes("أحداث")||
+    c.includes("زلزال")||
+    c.includes("fire")||
+    c.includes("event")
+  ){
 
-      status.textContent=
-        "🏢 اكتمل تحليل المباني.";
+    analyzeEvents();
 
-    }catch{
+    return;
+  }
 
-      status.textContent=
-        "تعذر الحصول على بيانات المباني.";
+  if(
+    c.includes("المنطقة")||
+    c.includes("رسمتها")||
+    c.includes("area")
+  ){
+
+    if(target?.type==="area"){
+
+      analyzeTarget();
+
+    }else{
+
+      showToast(
+        "لا توجد منطقة مرسومة حالياً"
+      );
     }
 
     return;
   }
 
-
   if(
-    input.includes("حدث") ||
-    input.includes("أحداث") ||
-    input.includes("زلزال") ||
-    input.includes("حريق") ||
-    input.includes("بركان") ||
-    input.includes("event") ||
-    input.includes("earth")
-  ){
-
-    status.textContent=
-      "🌋 تحميل أحداث NASA...";
-
-    await loadEarthEvents();
-
-    status.textContent=
-      "🌋 تم تحميل أحداث الأرض.";
-
-    return;
-  }
-
-
-  if(
-    input.includes("دولة") ||
-    input.includes("سكان") ||
-    input.includes("population") ||
-    input.includes("gdp") ||
-    input.includes("اقتصاد")
-  ){
-
-    status.textContent=
-      "🌍 تحميل بيانات الدولة...";
-
-    await loadCountryData();
-
-    status.textContent=
-      "🌍 اكتملت بيانات الدولة.";
-
-    return;
-  }
-
-
-  if(
-    input.includes("تغير") ||
-    input.includes("قارن") ||
-    input.includes("change") ||
-    input.includes("compare")
-  ){
-
-    renderChange();
-
-    status.textContent=
-      "🔄 عرض Change Intelligence.";
-
-    return;
-  }
-
-
-  if(
-    input.includes("تقرير") ||
-    input.includes("report")
+    c.includes("تقرير")||
+    c.includes("report")
   ){
 
     generateReport();
 
-    status.textContent=
-      "📄 تم إنشاء التقرير.";
-
     return;
   }
 
-
-  status.textContent=
-    "لم أفهم الأمر بعد. جرّب: حلل المنطقة، كم مبنى، الأحداث الطبيعية، بيانات الدولة، اعمل تقرير، قارن التغير.";
+  showToast(
+    "ASK TERRA: لم أفهم الأمر بعد."
+  );
 }
 
-
-/* ---------- REPORT ---------- */
+/* =========================================================
+   REPORT
+   ========================================================= */
 
 function generateReport(){
 
   if(!target){
 
-    alert("حدد Target أولًا.");
+    showToast("حدد هدفاً أولاً");
+
     return;
   }
 
-  const population=
-    lastCountryData?.population;
+  let report=
+`TERRA X — GEO INTELLIGENCE REPORT
 
-  const gdp=
-    lastCountryData?.gdp;
+TARGET TYPE:
+${target.type.toUpperCase()}
 
-  const life=
-    lastCountryData?.life;
+TARGET:
+${target.name||"Unnamed target"}
 
-  const snapshots=getSnapshots();
-
-  const report=
-`
-TERRA X — GEO INTELLIGENCE REPORT
-=================================
-
-TARGET
-------
-${target.name}
-
-Coordinates
+COORDINATES:
 ${target.lat.toFixed(6)}, ${target.lon.toFixed(6)}
 
-COUNTRY
--------
-${target.address?.country || "Unavailable"}
-
-DATA FUSION
------------
-Buildings:
-${lastBuildingCount===null?"Unavailable":formatNumber(lastBuildingCount)}
-
-Population:
+AREA:
 ${
-  population
-  ? formatNumber(population.value)+" ("+population.year+")"
-  : "Unavailable"
+  target.type==="area"?
+  formatArea(target.areaM2):
+  target.type==="radius"?
+  formatArea(Math.PI*target.radius*target.radius):
+  "Point target"
 }
 
-GDP:
-${
-  gdp
-  ? formatNumber(gdp.value)+" ("+gdp.year+")"
-  : "Unavailable"
-}
+BUILDINGS:
+${document.getElementById("statBuildings").textContent}
 
-Life expectancy:
-${
-  life
-  ? Number(life.value).toFixed(1)+" years ("+life.year+")"
-  : "Unavailable"
-}
+RELEVANT NATURAL EVENTS:
+${document.getElementById("statEvents").textContent}
 
-NASA OPEN EVENTS
-----------------
-${formatNumber(lastEvents.length)}
+DATA SOURCES:
+- OpenStreetMap / Overpass
+- NASA EONET
+- Nominatim
 
-CHANGE INTELLIGENCE
--------------------
-Local snapshots:
-${formatNumber(snapshots.length)}
-
-Last analysis:
-${lastAnalysis ? formatDate(lastAnalysis) : "Not available"}
-
-SOURCES
--------
-OpenStreetMap / Overpass
-World Bank Indicators API
-NASA EONET
-Esri World Imagery
-
-IMPORTANT
----------
-This report only states data actually returned by the connected sources.
-Unavailable data is not estimated or fabricated.
-Historical change is only reported when TERRA X has comparable saved
-snapshots on this device.
-
-Generated by TERRA X 7.0
+NOTE:
+Results depend on public-source coverage,
+freshness and availability.
+TERRA X does not invent unavailable data.
 `;
 
-  document.getElementById("reportBox").innerHTML=
-    `<div class="report">${escapeHTML(report)}</div>`;
-
+  logIntel(report);
 }
 
+/* =========================================================
+   SNAPSHOTS
+   ========================================================= */
 
-/* ---------- DRAWING ---------- */
+function saveSnapshot(){
 
-let drawing=false;
-let distanceDrawing=false;
-let points=[];
+  if(!target){
 
-function drawMode(){
+    showToast("حدد هدفاً أولاً");
 
-  drawing=true;
-  distanceDrawing=false;
-  points=[];
-
-  alert("اضغط على الخريطة لإضافة نقاط. اضغط Draw مرة أخرى لإنهاء المنطقة.");
-
-  map.once("click",handleDrawClick);
-
-}
-
-
-function handleDrawClick(e){
-
-  if(!drawing)return;
-
-  points.push(e.latlng);
-
-  L.circleMarker(
-    e.latlng,
-    {
-      radius:4,
-      color:"#20a8e8",
-      fillOpacity:1
-    }
-  ).addTo(drawLayer);
-
-  if(points.length>2){
-
-    const polygon=L.polygon(points,{
-      color:"#20a8e8",
-      fillOpacity:.18
-    }).addTo(drawLayer);
-
-    const area=L.GeometryUtil ?
-      null :
-      polygonArea(points);
-
-    if(area!==null){
-
-      alert(
-        "Approx area: "+
-        formatArea(area)
-      );
-
-    }
+    return;
   }
 
-  map.once("click",handleDrawClick);
+  const key="terra_x_snapshots";
+
+  const old=
+    JSON.parse(
+      localStorage.getItem(key)||"[]"
+    );
+
+  const snapshot={
+
+    id:Date.now(),
+
+    createdAt:new Date().toISOString(),
+
+    target:{
+      type:target.type,
+      lat:target.lat,
+      lon:target.lon,
+      areaM2:target.areaM2||null,
+      radius:target.radius||null,
+      polygon:target.polygon||null,
+      name:target.name||null
+    },
+
+    buildings:
+      document.getElementById("statBuildings").textContent,
+
+    events:
+      document.getElementById("statEvents").textContent
+  };
+
+  old.unshift(snapshot);
+
+  localStorage.setItem(
+    key,
+    JSON.stringify(old.slice(0,30))
+  );
+
+  logIntel(
+    "Snapshot saved locally • "+
+    new Date().toLocaleString()
+  );
+
+  showToast("تم حفظ Snapshot 💾");
 }
 
+function loadSnapshots(){
 
-function polygonArea(coords){
+  return JSON.parse(
+    localStorage.getItem(
+      "terra_x_snapshots"
+    )||"[]"
+  );
+}
+
+/* =========================================================
+   GPS
+   ========================================================= */
+
+function locateUser(){
+
+  if(!navigator.geolocation){
+
+    showToast("GPS غير مدعوم");
+
+    return;
+  }
+
+  showToast("جارٍ تحديد موقعك...");
+
+  navigator.geolocation.getCurrentPosition(
+
+    pos=>{
+
+      const lat=pos.coords.latitude;
+      const lon=pos.coords.longitude;
+      const acc=pos.coords.accuracy;
+
+      if(userMarker){
+        map.removeLayer(userMarker);
+      }
+
+      if(userCircle){
+        map.removeLayer(userCircle);
+      }
+
+      userMarker=L.marker([lat,lon])
+        .addTo(map)
+        .bindPopup("📍 موقعك")
+        .openPopup();
+
+      userCircle=L.circle(
+        [lat,lon],
+        {
+          radius:acc,
+          fillOpacity:.08,
+          weight:1
+        }
+      ).addTo(map);
+
+      map.setView([lat,lon],15);
+
+      setPointTarget(lat,lon,true);
+
+    },
+
+    err=>{
+
+      showToast(
+        "تعذر تحديد الموقع"
+      );
+
+    },
+
+    {
+      enableHighAccuracy:true,
+      timeout:15000,
+      maximumAge:0
+    }
+  );
+}
+
+/* =========================================================
+   DISTANCE
+   ========================================================= */
+
+function haversine(lat1,lon1,lat2,lon2){
 
   const R=6371000;
 
-  let area=0;
+  const p1=lat1*Math.PI/180;
+  const p2=lat2*Math.PI/180;
 
-  for(let i=0;i<coords.length;i++){
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLon=(lon2-lon1)*Math.PI/180;
 
-    const p1=coords[i];
-    const p2=coords[(i+1)%coords.length];
+  const a=
+    Math.sin(dLat/2)**2+
+    Math.cos(p1)*
+    Math.cos(p2)*
+    Math.sin(dLon/2)**2;
 
-    area +=
-      (p2.lng-p1.lng) *
-      Math.cos(
-        (p1.lat+p2.lat)*Math.PI/360
-      );
-  }
-
-  return Math.abs(area)*R*R/2*
-    Math.PI/180;
+  return 2*R*Math.asin(Math.sqrt(a));
 }
 
+/* =========================================================
+   INTEL LOG
+   ========================================================= */
 
-function formatArea(m2){
+function logIntel(text){
 
-  if(m2<10000)
-    return m2.toFixed(0)+" m²";
+  const el=document.getElementById("intelLog");
 
-  return (m2/1000000).toFixed(2)+" km²";
+  el.textContent=text;
+
+  console.log("[TERRA X]",text);
 }
 
+/* =========================================================
+   TOAST
+   ========================================================= */
 
-/* ---------- DISTANCE ---------- */
+let toastTimer=null;
 
-function distanceMode(){
+function showToast(text){
 
-  distanceDrawing=true;
-  drawing=false;
-  points=[];
+  const el=document.getElementById("toast");
 
-  alert("اضغط نقطتين على الخريطة لقياس المسافة.");
+  el.textContent=text;
 
-  map.once("click",handleDistanceClick);
+  el.classList.add("show");
+
+  clearTimeout(toastTimer);
+
+  toastTimer=setTimeout(()=>{
+    el.classList.remove("show");
+  },2600);
 }
 
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
 
-function handleDistanceClick(e){
+function escapeHtml(str){
 
-  points.push(e.latlng);
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
 
-  L.circleMarker(
-    e.latlng,
-    {
-      radius:4,
-      color:"#ffb14d",
-      fillOpacity:1
+/* =========================================================
+   KEYBOARD / COMMAND SUPPORT
+   ========================================================= */
+
+document.getElementById("searchInput")
+  .addEventListener("keydown",e=>{
+
+    if(e.key==="Enter"){
+      searchPlace();
     }
-  ).addTo(drawLayer);
 
-  if(points.length===2){
+  });
 
-    const d=map.distance(
-      points[0],
-      points[1]
-    );
+/*
+  ASK TERRA API داخلي بسيط.
+  لاحقاً يمكن ربطه بنموذج AI حقيقي.
+*/
 
-    L.polyline(points,{
-      color:"#ffb14d",
-      weight:3
-    }).addTo(drawLayer);
+window.askTerra=askTerra;
 
-    alert(
-      "Distance: "+
-      (
-        d>1000
-        ? (d/1000).toFixed(2)+" km"
-        : d.toFixed(0)+" m"
-      )
-    );
-
-    distanceDrawing=false;
-    points=[];
-
-  }else{
-
-    map.once("click",handleDistanceClick);
-  }
-}
-
-
-/* ---------- CLEAR ---------- */
-
-function clearMapData(){
-
-  drawLayer.clearLayers();
-
-  if(eventLayer){
-    map.removeLayer(eventLayer);
-    eventLayer=null;
-  }
-
-  if(targetMarker){
-    map.removeLayer(targetMarker);
-    targetMarker=null;
-  }
-
-  target=null;
-
-  document.getElementById("results").innerHTML="";
-
-  document.getElementById("targetName")
-    .textContent="No target selected";
-
-  document.getElementById("targetCoords")
-    .textContent=
-      "حدد مكانًا على الخريطة أو استخدم البحث.";
-
-}
-
-
-/* ---------- MAP CLICK TARGET ---------- */
-
-map.on("click",async e=>{
-
-  if(drawing || distanceDrawing)
-    return;
-
-  const lat=e.latlng.lat;
-  const lon=e.latlng.lng;
-
-  await setTarget(
-    lat,
-    lon,
-    "Map Target"
-  );
-
-});
-
-
-/* ---------- INITIAL ---------- */
-
-renderChange();
-
+/* =========================================================
+   END
+   ========================================================= */
 </script>
 
 </body>
