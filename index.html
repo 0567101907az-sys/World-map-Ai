@@ -1,399 +1,302 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WORLD MAP AI</title>
 
-<title>WORLD MAP AI</title>
+  <!-- Leaflet -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
-<style>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-* {
-    box-sizing: border-box;
-}
+    body {
+      margin: 0;
+      background: #07111f;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
 
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #10141c;
-    color: white;
-}
+    header {
+      padding: 18px;
+      text-align: center;
+      background: #0b1728;
+      border-bottom: 1px solid #20324a;
+    }
 
-.app {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
+    header h1 {
+      margin: 0;
+      font-size: 25px;
+    }
 
-/* =========================
-   HEADER
-========================= */
+    header p {
+      margin: 6px 0 0;
+      color: #9fb2c8;
+      font-size: 14px;
+    }
 
-.header {
-    padding: 18px;
-    text-align: center;
-    background: #171d27;
-    border-bottom: 1px solid #293241;
-}
+    .search-box {
+      padding: 14px;
+      background: #0b1728;
+      display: flex;
+      gap: 8px;
+    }
 
-.logo {
-    font-size: 25px;
-    font-weight: bold;
-}
+    #searchInput {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid #30445d;
+      border-radius: 12px;
+      background: #111f31;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
 
-.subtitle {
-    margin-top: 5px;
-    color: #aeb8c7;
-    font-size: 14px;
-}
+    #searchButton {
+      border: 0;
+      border-radius: 12px;
+      padding: 0 18px;
+      background: #238636;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
 
-/* =========================
-   AI SEARCH
-========================= */
+    #searchButton:active {
+      transform: scale(0.97);
+    }
 
-.ai-box {
-    padding: 15px;
-    background: #121822;
-}
+    #status {
+      padding: 8px 14px;
+      min-height: 36px;
+      color: #9fb2c8;
+      background: #07111f;
+      font-size: 14px;
+    }
 
-.search-container {
-    display: flex;
-    gap: 8px;
-}
+    #map {
+      width: 100%;
+      height: 65vh;
+      min-height: 420px;
+    }
 
-.search-input {
-    flex: 1;
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid #344052;
-    background: #1b2330;
-    color: white;
-    font-size: 16px;
-    outline: none;
-}
+    .results {
+      padding: 12px;
+      background: #0b1728;
+    }
 
-.search-button {
-    width: 55px;
-    border: none;
-    border-radius: 12px;
-    background: #2563eb;
-    color: white;
-    font-size: 20px;
-}
+    .result {
+      padding: 12px;
+      margin-bottom: 8px;
+      border: 1px solid #263a53;
+      border-radius: 12px;
+      background: #111f31;
+      cursor: pointer;
+    }
 
-/* =========================
-   CATEGORIES
-========================= */
+    .result strong {
+      display: block;
+      margin-bottom: 5px;
+    }
 
-.categories {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 10px 15px;
-}
+    .result small {
+      color: #9fb2c8;
+    }
 
-.category {
-    flex-shrink: 0;
-    padding: 10px 14px;
-    border-radius: 20px;
-    background: #1b2330;
-    border: 1px solid #344052;
-    color: white;
-    font-size: 13px;
-}
+    .empty {
+      color: #7f93aa;
+      text-align: center;
+      padding: 10px;
+    }
 
-/* =========================
-   MAP
-========================= */
-
-.map {
-    flex: 1;
-    min-height: 420px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            rgba(20,30,40,0.85),
-            rgba(20,30,40,0.85)
-        ),
-        repeating-linear-gradient(
-            0deg,
-            transparent,
-            transparent 39px,
-            #263241 40px
-        ),
-        repeating-linear-gradient(
-            90deg,
-            transparent,
-            transparent 39px,
-            #263241 40px
-        );
-}
-
-.map-content {
-    text-align: center;
-    color: #aeb8c7;
-}
-
-.map-icon {
-    font-size: 70px;
-    margin-bottom: 10px;
-}
-
-/* =========================
-   AI PANEL
-========================= */
-
-.ai-panel {
-    padding: 15px;
-    background: #171d27;
-    border-top: 1px solid #293241;
-}
-
-.ai-title {
-    font-size: 17px;
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.ai-description {
-    color: #aeb8c7;
-    font-size: 14px;
-}
-
-/* =========================
-   LANGUAGE
-========================= */
-
-.language {
-    margin-top: 10px;
-    text-align: center;
-}
-
-.language button {
-    padding: 8px 15px;
-    border-radius: 15px;
-    border: 1px solid #344052;
-    background: #1b2330;
-    color: white;
-}
-
-</style>
+    .leaflet-popup-content {
+      direction: rtl;
+      text-align: right;
+    }
+  </style>
 </head>
-
 
 <body>
 
-<div class="app">
+<header>
+  <h1>🌍 WORLD MAP AI</h1>
+  <p>مساعدك الجغرافي العالمي</p>
+</header>
 
-    <!-- HEADER -->
-
-    <div class="header">
-
-        <div class="logo">
-            🌍 WORLD MAP AI
-        </div>
-
-        <div class="subtitle">
-            مساعدك الجغرافي الذكي
-        </div>
-
-    </div>
-
-
-    <!-- AI SEARCH -->
-
-    <div class="ai-box">
-
-        <div class="search-container">
-
-            <input
-                id="searchInput"
-                class="search-input"
-                type="text"
-                placeholder="🔎 اسأل عن أي مكان..."
-            >
-
-            <button
-                class="search-button"
-                onclick="searchPlace()"
-            >
-                🔍
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- CATEGORIES -->
-
-    <div class="categories">
-
-        <button class="category">
-            📍 الكل
-        </button>
-
-        <button class="category">
-            🏫 مدارس
-        </button>
-
-        <button class="category">
-            🏥 مستشفيات
-        </button>
-
-        <button class="category">
-            🕌 مساجد
-        </button>
-
-        <button class="category">
-            🎓 جامعات
-        </button>
-
-        <button class="category">
-            🏟️ ملاعب
-        </button>
-
-    </div>
-
-
-    <!-- MAP -->
-
-    <div class="map">
-
-        <div class="map-content">
-
-            <div class="map-icon">
-                🗺️
-            </div>
-
-            <div>
-                الخريطة ستظهر هنا
-            </div>
-
-            <div style="font-size:12px;margin-top:5px;">
-                Your map will appear here
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- AI PANEL -->
-
-    <div class="ai-panel">
-
-        <div class="ai-title">
-            🤖 WORLD MAP AI
-        </div>
-
-        <div
-            id="aiMessage"
-            class="ai-description"
-        >
-            اسألني عن أي مكان في العالم...
-        </div>
-
-
-        <div class="language">
-
-            <button onclick="changeLanguage()">
-                🇵🇸 العربية / 🇬🇧 English
-            </button>
-
-        </div>
-
-    </div>
-
+<div class="search-box">
+  <input
+    id="searchInput"
+    type="text"
+    placeholder="🔎 ابحث عن مدينة أو مكان..."
+    autocomplete="off"
+  >
+  <button id="searchButton">بحث</button>
 </div>
 
+<div id="status">
+  اكتب اسم مكان ثم اضغط بحث 🔎
+</div>
+
+<div id="map"></div>
+
+<div class="results" id="results">
+  <div class="empty">
+    نتائج البحث ستظهر هنا
+  </div>
+</div>
+
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+  // إنشاء الخريطة
+  const map = L.map("map").setView([31.95, 35.91], 7);
 
-let language = "ar";
+  // OpenStreetMap
+  L.tileLayer(
+    "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }
+  ).addTo(map);
 
+  let markers = [];
 
-function searchPlace() {
+  const input = document.getElementById("searchInput");
+  const button = document.getElementById("searchButton");
+  const status = document.getElementById("status");
+  const resultsBox = document.getElementById("results");
 
-    const input =
-        document.getElementById("searchInput");
+  function clearMarkers() {
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+  }
 
-    const message =
-        document.getElementById("aiMessage");
+  function addMarker(place) {
+    const lat = Number(place.lat);
+    const lon = Number(place.lon);
 
-    const place =
-        input.value.trim();
+    const marker = L.marker([lat, lon]).addTo(map);
 
+    marker.bindPopup(`
+      <strong>${escapeHTML(place.display_name)}</strong>
+    `);
 
-    if (!place) {
+    markers.push(marker);
 
-        message.innerText =
-            language === "ar"
-            ? "❌ اكتب اسم مكان أولاً."
-            : "❌ Enter a place first.";
+    return marker;
+  }
 
+  function escapeHTML(text) {
+    return String(text)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  async function searchPlace() {
+    const query = input.value.trim();
+
+    if (!query) {
+      status.textContent = "اكتب اسم مكان أولًا 🔎";
+      return;
+    }
+
+    status.textContent = "🔄 جاري البحث...";
+    resultsBox.innerHTML = "";
+
+    try {
+      const url =
+        "https://nominatim.openstreetmap.org/search" +
+        "?format=jsonv2" +
+        "&limit=10" +
+        "&q=" +
+        encodeURIComponent(query);
+
+      const response = await fetch(url, {
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Search failed");
+      }
+
+      const places = await response.json();
+
+      clearMarkers();
+
+      if (!places.length) {
+        status.textContent = "❌ لم نجد نتائج لهذا البحث.";
+        resultsBox.innerHTML =
+          '<div class="empty">جرّب اسم مدينة أو مكان مختلف.</div>';
         return;
+      }
+
+      status.textContent =
+        `✅ وجدنا ${places.length} نتيجة`;
+
+      places.forEach((place, index) => {
+        const marker = addMarker(place);
+
+        const item = document.createElement("div");
+        item.className = "result";
+
+        item.innerHTML = `
+          <strong>${index + 1}. ${escapeHTML(
+            place.name || place.display_name
+          )}</strong>
+          <small>${escapeHTML(place.display_name)}</small>
+        `;
+
+        item.addEventListener("click", () => {
+          const lat = Number(place.lat);
+          const lon = Number(place.lon);
+
+          map.setView([lat, lon], 15);
+          marker.openPopup();
+        });
+
+        resultsBox.appendChild(item);
+      });
+
+      const first = places[0];
+
+      map.setView(
+        [Number(first.lat), Number(first.lon)],
+        12
+      );
+
+    } catch (error) {
+      console.error(error);
+
+      status.textContent =
+        "⚠️ حدث خطأ أثناء البحث. حاول مرة أخرى.";
+
+      resultsBox.innerHTML =
+        '<div class="empty">تعذر الاتصال بخدمة البحث.</div>';
     }
+  }
 
+  button.addEventListener("click", searchPlace);
 
-    message.innerText =
-        language === "ar"
-        ? "🔎 جاري البحث عن: " + place
-        : "🔎 Searching for: " + place;
-
-}
-
-
-function changeLanguage() {
-
-    language =
-        language === "ar"
-        ? "en"
-        : "ar";
-
-
-    const input =
-        document.getElementById("searchInput");
-
-    const message =
-        document.getElementById("aiMessage");
-
-
-    if (language === "en") {
-
-        document.documentElement.lang = "en";
-
-        document.documentElement.dir = "ltr";
-
-        input.placeholder =
-            "🔎 Ask about any place...";
-
-        message.innerText =
-            "Ask me about any place in the world.";
-
-    } else {
-
-        document.documentElement.lang = "ar";
-
-        document.documentElement.dir = "rtl";
-
-        input.placeholder =
-            "🔎 اسأل عن أي مكان...";
-
-        message.innerText =
-            "اسألني عن أي مكان في العالم...";
-
+  input.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      searchPlace();
     }
-
-}
-
+  });
 </script>
 
 </body>
-
 </html>
